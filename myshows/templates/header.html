@@ -1,0 +1,35 @@
+{% load static %}
+<header role="banner">
+    <div class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-sm">
+            <div class="navbar-brand">
+                <a href="https://myshows.me/">
+                    <img src="{% static 'img/logo.png' %}" alt="My image">
+                </a>
+            </div>
+            <div class="nav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="/search/all/">Сериалы</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/ratings/">Рейтинги</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/community/">Сообщество</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/news/">Новости</a></li>
+                </ul>
+            </div>
+            <form class="d-flex" action="https://myshows.me/search/" method="get">
+                <input class="form-control mr-sm-2" type="search" name="q" autocomplete="off" placeholder="Найти сериал" id="searchSuggestionsInput">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit" title="Найти">Найти</button>
+            </form>
+            <div class="navbar-nav dropdown">
+                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Dropdown</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/Azteki/comments">Комментарии</a>
+                    <a class="dropdown-item" href="/profile/notes/">Заметки</a>
+                    <a class="dropdown-item" href="/profile/edit/">Настройки</a>
+                    <a class="dropdown-item" href="/pro/">PRO</a>
+                    <a class="dropdown-item" href="/int/userecho">Поддержка</a>
+                    <a class="dropdown-item" href="/logout/">Выход</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

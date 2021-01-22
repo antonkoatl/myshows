@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% endblock %}
+
+{% block sidebar %}
+    <table class="table">
+        <tbody>
+            {% for show in shows %}
+                <tr>
+                    <td>
+                        <a href="{% url 'detail' show.id %}">{{ show.name_original }}</a>
+                        <br>
+                        {{ show.description }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

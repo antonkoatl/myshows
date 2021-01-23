@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.views import generic
 
@@ -6,8 +7,8 @@ from myshows.models import Show, Poster, Article
 
 def index(request):
     shows = Show.objects.order_by('-myshows_rating').all()[:10]
-    news = Article.objects.all()[:10]
-    return render(request, 'index.html', context={'shows': shows, 'page_obj': news})
+    news = Article.objects.all()
+    return render(request, 'index.html', context={'shows': shows, 'news_list': Paginator(news, 5).page(1)})
 
 
 class ShowDetailView(generic.DetailView):

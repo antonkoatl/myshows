@@ -7,6 +7,22 @@ class Country(models.TextChoices):
     UNKNOWN = "UN", _("Неизвестно")
     GREAT_BRITAIN = "UK", _("Великобритания")
     USA = "US", _("США")
+    JAPAN = "JP", _("Япония")
+    CANADA = "CA", _("Канада")
+    NORWAY = "NO", _("Норвегия")
+    RUSSIA = "RU", _("Россия")
+    ITALY = "IT", _("Италия")
+    AUSTRALIA = "AU", _("Австралия")
+    USSR = "SU", _("СССР")
+    FRANCE = "FR", _("Франция")
+    SWEDEN = "SE", _("Швеция")
+    UKRAINE = "UA", _("Украина")
+    ARGENTINA = "AR", _("Аргентина")
+    KOREA = "KR", _("Южная Корея")
+    LATVIA = "LV", _("Латвия")
+    TURKEY = "TR", _("Турция")
+    GERMANY = "DE", _("Германия")
+    BRASIL = "BR", _("Бразилия")
 
 
 class Network(models.Model):
@@ -20,9 +36,15 @@ class Network(models.Model):
 class Genre(models.Model):
     title = models.CharField(max_length=200)
 
+    def __str__(self):
+        return str(self.title)
+
 
 class Tag(models.Model):
     title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return str(self.title)
 
 
 class Show(models.Model):
@@ -32,6 +54,8 @@ class Show(models.Model):
         CANCELED_ENDED = "C/E", _("Отменено/Завершено")
         TBD = "TBD", _("Будет определено")
         RETURNING_SERIES = "AIR", _("Сериал продолжается")
+        NEW_SERIES = "NEW", _("Новый сериал")
+        IN_DEVELOPMENT = "IND", _("В производстве")
 
     class ShowTypes(models.TextChoices):
         SHOW = "show", _("Сериал")
@@ -79,6 +103,10 @@ class Show(models.Model):
     imdb_id = models.IntegerField(null=True)
     imdb_rating = models.IntegerField(null=True)
     imdb_voted = models.IntegerField(null=True)
+
+
+    def __str__(self):
+        return f'Show[{self.title_original}]'
 
 
 class Poster(models.Model):

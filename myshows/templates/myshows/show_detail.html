@@ -4,8 +4,8 @@
     <div class="container">
         <div class="row">
             <div class="col-sm">
-                <div class="row" style="width:300px; height:400px;">
-                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+                <div class="row" style="width:300px;">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" style="background-color:#f8edeb">
                         <ol class="carousel-indicators">
                             {% for poster in posters %}
                                 <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == 0%} class="active"{% endif %}></li>
@@ -14,7 +14,7 @@
 
                         <div class="carousel-inner rounded">
                             {% for poster in posters %}
-                                <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}" style="background-color:#f8edeb">
+                                <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}">
                                     <img src="{{ poster.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
                                 </div>
                             {% endfor %}
@@ -33,10 +33,26 @@
                     trailer
                 </div>
             </div>
-            <div class="col-sm">
-                <h1>{{ object.title_original }}</h1>
-                <p>{{ object.description }}</p>
+            <div class="col">
+                <div class="row">
+                    <h1>{{ object.title_ru }}</h1>
+                    <h3>{{ object.title_original }}</h3>
+                </div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Дата выхода:</span> {{ object.started }}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Страна:</span> {{ object.country }}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Жанры:</span> {% for genre in object.genres.all %}{% if forloop.counter0 > 0%}, {% endif %}{{ genre }}{% endfor %}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Тэги:</span> {% for tag in object.tags.all %}{% if forloop.counter0 > 0%}, {% endif %}{{ tag }}{% endfor %}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Канал:</span> {{ object.network }}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Общая длительность:</span> {{ object.runtime_total_str }}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Длительность эпизода:</span> {{ object.runtime_one }}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Рейтинг MyShows:</span> {{ object.myshows_rating }} : {{ object.myshows_voted }}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Рейтинг Кинопоиска:</span> {{ object.kinopoisk_rating }} : {{ object.kinopoisk_voted }}</div>
+                <div class="fs-6"><span class="badge bg-light text-dark">Рейтинг IMDB:</span> {{ object.imdb_rating }} : {{ object.imdb_voted }}</div>
+
             </div>
+        </div>
+        <div class="row">
+            <p>{{ object.description|safe }}</p>
         </div>
     </div>
 {% endblock %}

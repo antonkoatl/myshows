@@ -2,7 +2,7 @@
 
 {% block content %}
     {% for show in page_obj %}
-        <div class="fs-4"><a href="{% url 'detail' show.id %}">{{ show.title_ru }}</a></div>
+        <div class="fs-4"><a class="btn btn-light" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a></div>
     {% endfor %}
 
 <div class="pagination">

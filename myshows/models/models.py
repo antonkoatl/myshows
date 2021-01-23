@@ -1,10 +1,84 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+class Country(models.TextChoices):
+    UNKNOWN = "UN", _("Неизвестно")
+    GREAT_BRITAIN = "UK", _("Великобритания")
+    USA = "US", _("США")
+
+
+class Network(models.Model):
+    title = models.CharField(max_length=200)
+    country = models.CharField(max_length=2, choices=Country.choices, default=Country.UNKNOWN)
+
+    def __str__(self):
+        return f"{self.title} - {self.country}"
+
+
+class Genre(models.Model):
+    title = models.CharField(max_length=200)
+
+
+class Tag(models.Model):
+    title = models.CharField(max_length=200)
 
 
 class Show(models.Model):
-    name_original = models.CharField(max_length=200)
+
+    class BroadcastStatus(models.TextChoices):
+        UNKNOWN = "UKN", _("Неизвестно")
+        CANCELED_ENDED = "C/E", _("Отменено/Завершено")
+        TBD = "TBD", _("Будет определено")
+        RETURNING_SERIES = "AIR", _("Сериал продолжается")
+
+    class ShowTypes(models.TextChoices):
+        SHOW = "show", _("Сериал")
+        FULL = "full", _("Полнометражный")
+        SHORT = "shrt", _("Короткометражный")
+
+    class ShowCategories(models.TextChoices):
+        FILM = "film", _("Кино")
+        CARTOON = "cart", _("Мультфильм")
+        ANIME = "anim", _("Аниме")
+        ANIMATION = "anit", _("Анимация")
+        THEATRE = "thea", _("Театр")
+        TV = "tv", _("ТВ шоу")
+
+
+    title_original = models.CharField(max_length=200)
+    title_ru = models.CharField(max_length=200, blank=True)
+    broadcast_status = models.CharField(max_length=3, default=BroadcastStatus.UNKNOWN, choices=BroadcastStatus.choices)
+    seasons_total = models.IntegerField()
+    year = models.IntegerField()
     description = models.TextField()
+    category = models.CharField(max_length=4, choices=ShowCategories.choices)
+    type = models.CharField(max_length=4, choices=ShowTypes.choices)
+    country = models.CharField(max_length=200, default=Country.UNKNOWN.value)
+    started = models.DateField()
+    ended = models.DateField(null=True)
+    runtime_one = models.DurationField()
+    runtime_total = models.DurationField(null=True)
+    runtime_total_str = models.CharField(max_length=200)
+    genres = models.ManyToManyField(Genre)
+    tags = models.ManyToManyField(Tag)
+    network = models.ForeignKey(Network, null=True, on_delete=models.PROTECT)
+
+    myshows_id = models.IntegerField(null=True)
+    myshows_watching = models.IntegerField(null=True)
+    myshows_voted = models.IntegerField(null=True)
+    myshows_rating = models.FloatField(null=True)
+
+    kinopoisk_id = models.IntegerField(null=True)
+    kinopoisk_rating = models.FloatField(null=True)
+    kinopoisk_voted = models.IntegerField(null=True)
+
+    tvrage_id = models.IntegerField(null=True)
+
+    imdb_id = models.IntegerField(null=True)
+    imdb_rating = models.IntegerField(null=True)
+    imdb_voted = models.IntegerField(null=True)
 
 
 class Poster(models.Model):

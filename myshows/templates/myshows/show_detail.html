@@ -14,7 +14,7 @@
 
                         <div class="carousel-inner rounded">
                             {% for poster in posters %}
-                                <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}" style="background-color:#540b0e">
+                                <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}" style="background-color:#f8edeb">
                                     <img src="{{ poster.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
                                 </div>
                             {% endfor %}
@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="col-sm">
-                <h1>{{ object.name_original }}</h1>
+                <h1>{{ object.title_original }}</h1>
                 <p>{{ object.description }}</p>
             </div>
         </div>

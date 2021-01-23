@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="row" style="width:300px;">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" style="background-color:#f8edeb">
+                        <ol class="carousel-indicators">
+                            {% for image in object.articleimage_set.all %}
+                                <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == 0%} class="active"{% endif %}></li>
+                            {% endfor %}
+                        </ol>
+
+                        <div class="carousel-inner rounded">
+                            {% for image in object.articleimage_set.all %}
+                                <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}">
+                                    <img src="{{ image.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                    </div>
+                </div>
+                {% if object.video %}
+                    <div class="row">
+                        {{ object.video|safe }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <h1>{{ object.title }}</h1>
+                    <h3>{{ object.foreword }}</h3>
+                </div>
+                <div class="fs-4">{{ object.published_at }}</div>
+                <div class="fs-4">{{ object.category }}</div>
+                <div class="fs-4">{{ object.tags }}</div>
+                <div class="fs-4">{{ object.source }}</div>
+            </div>
+        </div>
+        <div class="row">
+            <p>{{ object.content|safe }}</p>
+        </div>
+    </div>
+{% endblock %}

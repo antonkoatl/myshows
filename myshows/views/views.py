@@ -8,7 +8,8 @@ from myshows.models import Show, Poster, Article
 def index(request):
     shows = Show.objects.order_by('-myshows_rating').all()[:10]
     news = Article.objects.all()
-    return render(request, 'index.html', context={'shows': shows, 'news_list': Paginator(news, 5).page(1)})
+    page = request.GET.get('page', 1)
+    return render(request, 'index.html', context={'shows': shows, 'news_list': Paginator(news, 5).page(page)})
 
 
 class ShowDetailView(generic.DetailView):
@@ -39,4 +40,8 @@ class SearchShowListView(generic.ListView):
 class NewsListView(generic.ListView):
     model = Article
     paginate_by = 20
+
+
+class NewsDetailView(generic.DetailView):
+    model = Article
 

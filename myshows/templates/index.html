@@ -10,7 +10,7 @@
             {% for show in shows %}
                 <tr>
                     <td>
-                        <a href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
+                        <a class="btn btn-light" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
                     </td>
                 </tr>
             {% endfor %}

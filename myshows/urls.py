@@ -13,4 +13,6 @@ urlpatterns = [
     path('all/', views.ShowListView.as_view(), name='all'),
     # ex: /myshows/news/
     path('news/', views.NewsListView.as_view(), name='news'),
+    # ex: /myshows/news/5/
+    path('news/<int:pk>/', views.NewsDetailView.as_view(), name='news_detail'),
 ]

@@ -1,0 +1,27 @@
+{% for article in page_obj %}
+    <div class="row">
+        <div class="col" style="max-width:400px;"><img src="{{ article.articleimage_set.first.image.url }}" class="img-thumbnail" alt="..."></div>
+        <div class="col">
+            <a class="fs-4 btn btn-light" href="{% url 'detail' article.id %}">{{ article.title }}</a>
+            <div class="fs-4">{{ article.published_at }}</div>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a class="page-link" href="?page=1">&laquo; first</a>
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <li class="page-item active" aria-current="page">
+        <span class="page-link">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+    </li>
+
+    {% if page_obj.has_next %}
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a>
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+</div>

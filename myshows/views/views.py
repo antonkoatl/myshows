@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.views import generic
 
-from myshows.models import Show, Poster
+from myshows.models import Show, Poster, Article
 
 
 def index(request):
     shows = Show.objects.order_by('-myshows_rating').all()[:10]
-    return render(request, 'index.html', context={'shows': shows})
+    news = Article.objects.all()[:10]
+    return render(request, 'index.html', context={'shows': shows, 'page_obj': news})
 
 
 class ShowDetailView(generic.DetailView):
@@ -32,3 +33,9 @@ class SearchShowListView(generic.ListView):
     def get_queryset(self):
         query = self.request.GET['q']
         return Show.objects.filter(title_ru__icontains=query)
+
+
+class NewsListView(generic.ListView):
+    model = Article
+    paginate_by = 20
+

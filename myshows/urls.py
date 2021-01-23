@@ -11,4 +11,6 @@ urlpatterns = [
     path('search/', views.SearchShowListView.as_view(), name='search'),
     # ex: /myshows/all/
     path('all/', views.ShowListView.as_view(), name='all'),
+    # ex: /myshows/news/
+    path('news/', views.NewsListView.as_view(), name='news'),
 ]

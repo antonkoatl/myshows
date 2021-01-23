@@ -9,13 +9,13 @@
             </div>
             <div class="nav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="/search/all/">Сериалы</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'all' %}">Сериалы</a></li>
                     <li class="nav-item"><a class="nav-link" href="/ratings/">Рейтинги</a></li>
                     <li class="nav-item"><a class="nav-link" href="/community/">Сообщество</a></li>
                     <li class="nav-item"><a class="nav-link" href="/news/">Новости</a></li>
                 </ul>
             </div>
-            <form class="d-flex" action="{% url 'search' show.id %}" method="get">
+            <form class="d-flex" action="{% url 'search' %}" method="get">
                 <input class="form-control mr-sm-2" type="search" name="q" autocomplete="off" placeholder="Найти сериал" id="searchSuggestionsInput">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit" title="Найти">Найти</button>
             </form>

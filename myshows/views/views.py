@@ -9,6 +9,10 @@ def index(request):
     return render(request, 'index.html', context={'shows': shows})
 
 
+def search(request):
+    return render(request, 'search.html', context={})
+
+
 class ShowDetailView(generic.DetailView):
     model = Show
 
@@ -19,3 +23,8 @@ class ShowDetailView(generic.DetailView):
 
     def get_object(self):
         return self.model.objects.filter(pk=self.kwargs['pk']).prefetch_related('genres', 'tags').get()
+
+
+class ShowListView(generic.ListView):
+    model = Show
+    paginate_by = 20

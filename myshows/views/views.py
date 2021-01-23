@@ -9,10 +9,6 @@ def index(request):
     return render(request, 'index.html', context={'shows': shows})
 
 
-def search(request):
-    return render(request, 'search.html', context={})
-
-
 class ShowDetailView(generic.DetailView):
     model = Show
 
@@ -28,3 +24,11 @@ class ShowDetailView(generic.DetailView):
 class ShowListView(generic.ListView):
     model = Show
     paginate_by = 20
+
+
+class SearchShowListView(generic.ListView):
+    paginate_by = 20
+
+    def get_queryset(self):
+        query = self.request.GET['q']
+        return Show.objects.filter(title_ru__icontains=query)

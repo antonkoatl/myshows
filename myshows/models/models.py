@@ -3,31 +3,18 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Country(models.TextChoices):
-    UNKNOWN = "UN", _("Неизвестно")
-    GREAT_BRITAIN = "UK", _("Великобритания")
-    USA = "US", _("США")
-    JAPAN = "JP", _("Япония")
-    CANADA = "CA", _("Канада")
-    NORWAY = "NO", _("Норвегия")
-    RUSSIA = "RU", _("Россия")
-    ITALY = "IT", _("Италия")
-    AUSTRALIA = "AU", _("Австралия")
-    USSR = "SU", _("СССР")
-    FRANCE = "FR", _("Франция")
-    SWEDEN = "SE", _("Швеция")
-    UKRAINE = "UA", _("Украина")
-    ARGENTINA = "AR", _("Аргентина")
-    KOREA = "KR", _("Южная Корея")
-    LATVIA = "LV", _("Латвия")
-    TURKEY = "TR", _("Турция")
-    GERMANY = "DE", _("Германия")
-    BRASIL = "BR", _("Бразилия")
+class Country(models.Model):
+    name_short = models.CharField(max_length=2)
+    name = models.CharField(max_length=100)
+    name_ru = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.name_ru)
 
 
 class Network(models.Model):
     title = models.CharField(max_length=200)
-    country = models.CharField(max_length=2, choices=Country.choices, default=Country.UNKNOWN)
+    country = models.ForeignKey(Country, on_delete=models.PROTECT)
 
     def __str__(self):
         return f"{self.title} - {self.country}"
@@ -79,7 +66,7 @@ class Show(models.Model):
     description = models.TextField()
     category = models.CharField(max_length=4, choices=ShowCategories.choices)
     type = models.CharField(max_length=4, choices=ShowTypes.choices)
-    country = models.CharField(max_length=200, default=Country.UNKNOWN.value)
+    country = models.ManyToManyField(Country)
     started = models.DateField()
     ended = models.DateField(null=True)
     runtime_one = models.DurationField()

@@ -1,1 +1,22 @@
 {% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% include "myshows/show_by_country_list_block.html" with page_obj=show_countries %}
+            </div>
+            <div class="col">
+                One of three columns
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                One of three columns
+            </div>
+            <div class="col">
+                One of three columns
+            </div>
+        </div>
+    </div>
+{% endblock %}

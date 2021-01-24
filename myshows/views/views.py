@@ -62,4 +62,7 @@ class RatingsDetailView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active'] = 'ratings'
+
+        context['show_countries'] = Show
+
         return context

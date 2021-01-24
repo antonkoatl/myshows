@@ -1,9 +1,11 @@
-{% for show in page_obj %}
-    <div class="row">
-        <div class="col" style="max-width:400px;"><img src="{{ show.poster_set.first.image.url }}" class="img-thumbnail" alt="..."></div>
-        <div class="col">
-            <a class="fs-4 btn btn-light" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
-            <div class="fs-4">{{ article.published_at }}</div>
+<div class="row p-3 border">
+    <div class="fs-4">{{ page_obj.title }}</div>
+    {% for item in page_obj.data %}
+        <div class="row border">
+            <div class="fs-4"><span class="badge bg-light text-dark">{{ item.title }}</span> {{ item.shows_data }}</div>
+            {% for item in item.show_set.all|slice:":3" %}
+                <div class="row p-1"><a class="fs-6 btn-light" href="{% url 'detail' item.id %}">{{ item.title_ru }}</a></div>
+            {% endfor %}
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>

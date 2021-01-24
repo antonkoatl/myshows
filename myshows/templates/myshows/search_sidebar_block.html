@@ -1,0 +1,89 @@
+<form id="searchForm" action="{% url 'all' %}" method="get">
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading1">
+                <button class="accordion-button{% if 'genre' not in request.GET %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                    {% if 'genre' in request.GET %}<strong>Жанры</strong>{% else %}Жанры{% endif %}<sup class="badge bg-light text-dark">and</sup>
+                </button>
+            </h2>
+            <div id="collapse1" class="accordion-collapse collapse{% if 'genre' in request.GET %} show{% endif %}" aria-labelledby="heading1" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {% for genre in genres %}
+                        <div>
+                            <input name="genre" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ genre.id }}" aria-label="..." {% if genre.id|stringformat:"i" in request.GET|get_list:"genre" %}checked="checked"{% endif %}>
+                            <a class="list-group-item-action" href="{% url 'all' %}?genre={{ genre.id }}">{{ genre.title }} : {{ genre.shows_count }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading2">
+                <button class="accordion-button{% if 'tag' not in request.GET %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="true" aria-controls="collapse2">
+                    {% if 'tag' in request.GET %}<strong>Тэги</strong>{% else %}Тэги{% endif %}<sup class="badge bg-light text-dark">and</sup>
+                </button>
+            </h2>
+            <div id="collapse2" class="accordion-collapse collapse{% if 'tag' in request.GET %} show{% endif %}" aria-labelledby="heading2" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {% for tag in tags %}
+                        <div>
+                            <input name="tag" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ tag.id }}" aria-label="..." {% if tag.id|stringformat:"i" in request.GET|get_list:"tag" %}checked="checked"{% endif %}>
+                            <a class="list-group-item-action" href="{% url 'all' %}?tag={{ tag.id }}">{{ tag.title }} : {{ tag.shows_count }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading3">
+                <button class="accordion-button{% if 'year' not in request.GET %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="true" aria-controls="collapse3">
+                    {% if 'year' in request.GET %}<strong>Год</strong>{% else %}Год{% endif %}<sup class="badge bg-light text-dark">or</sup>
+                </button>
+            </h2>
+            <div id="collapse3" class="accordion-collapse collapse{% if 'year' in request.GET %} show{% endif %}" aria-labelledby="heading3" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {% for year in years %}
+                        <div>
+                            <input name="year" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ year.year }}" aria-label="..." {% if year.year|stringformat:"i" in request.GET|get_list:"year" %}checked="checked"{% endif %}>
+                            <a class="list-group-item-action" href="{% url 'all' %}?year={{ year.year }}">{{ year.year }} : {{ year.shows_count }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading4">
+                <button class="accordion-button{% if 'country' not in request.GET %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="true" aria-controls="collapse4">
+                    {% if 'country' in request.GET %}<strong>Страна</strong>{% else %}Страна{% endif %}<sup class="badge bg-light text-dark">or</sup>
+                </button>
+            </h2>
+            <div id="collapse4" class="accordion-collapse collapse{% if 'country' in request.GET %} show{% endif %}" aria-labelledby="heading4" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {% for country in countries %}
+                        <div>
+                            <input name="country" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ country.id }}" aria-label="..." {% if country.id|stringformat:"i" in request.GET|get_list:"country" %}checked="checked"{% endif %}>
+                            <a class="list-group-item-action" href="{% url 'all' %}?country={{ country.id }}">{{ country.name_ru }} : {{ country.shows_count }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading5">
+                <button class="accordion-button{% if 'category' not in request.GET %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="true" aria-controls="collapse5">
+                    {% if 'category' in request.GET %}<strong>Категория</strong>{% else %}Категория{% endif %}<sup class="badge bg-light text-dark">or</sup>
+                </button>
+            </h2>
+            <div id="collapse5" class="accordion-collapse collapse{% if 'category' in request.GET %} show{% endif %}" aria-labelledby="heading5" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    {% for category in categories %}
+                        <div>
+                            <input name="category" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ category.category }}" aria-label="..." {% if category.category in request.GET|get_list:"category" %}checked="checked"{% endif %}>
+                            <a class="list-group-item-action" href="{% url 'all' %}?category={{ category.category }}">{{ category.category }} : {{ category.shows_count }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

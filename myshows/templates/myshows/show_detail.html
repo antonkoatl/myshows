@@ -39,9 +39,13 @@
                     <h3>{{ object.title_original }}</h3>
                 </div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Дата выхода:</span> {{ object.started }}</div>
-                <div class="fs-4"><span class="badge bg-light text-dark">Страна:</span> {% for country in object.country.all %}{% if forloop.counter0 > 0%}, {% endif %}{{ country }}{% endfor %}</div>
-                <div class="fs-4"><span class="badge bg-light text-dark">Жанры:</span> {% for genre in object.genres.all %}{% if forloop.counter0 > 0%}, {% endif %}{{ genre }}{% endfor %}</div>
-                <div class="fs-4"><span class="badge bg-light text-dark">Тэги:</span> {% for tag in object.tags.all %}{% if forloop.counter0 > 0%}, {% endif %}{{ tag }}{% endfor %}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Страна:</span>
+                    {% for country in object.country.all %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?country={{ country.id }}">{{ country.name_ru }}</a>{% endfor %}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Жанры:</span>
+                    {% for genre in object.genres.all %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?genre={{ genre.id }}">{{ genre.title }}</a>{% endfor %}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Тэги:</span>
+                    {% for tag in object.tags.all %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?tag={{ tag.id }}">{{ tag.title }}</a>{% endfor %}</div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Категория:</span> <a class="fs-6 link-dark" href="{% url 'all' %}?category={{ object.category }}">{{ object.get_category_display }}</a></div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Канал:</span> {{ object.network }}</div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Общая длительность:</span> {{ object.runtime_total_str }}</div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Длительность эпизода:</span> {{ object.runtime_one }}</div>

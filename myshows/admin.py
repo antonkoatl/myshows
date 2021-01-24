@@ -1,9 +1,10 @@
 from django.contrib import admin
 
-from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country
+from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country, Network
 
 admin.site.register(Poster)
 admin.site.register(ArticleImage)
+admin.site.register(Network)
 
 
 class ShowAdmin(admin.ModelAdmin):

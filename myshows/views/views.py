@@ -32,7 +32,35 @@ class ShowListView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['active'] = 'all'
+
+        context['genres'] = Genre.objects.annotate(shows_count=Count('show')).order_by('-shows_count')
+        context['tags'] = Tag.objects.annotate(shows_count=Count('show')).order_by('-shows_count')
+        context['years'] = Show.objects.values('year').annotate(shows_count=Count('year')).order_by('-year')
+        context['countries'] = Country.objects.annotate(shows_count=Count('show')).order_by('-shows_count')
+        context['categories'] = Show.objects.values('category').annotate(shows_count=Count('category')).order_by('-shows_count')
+
+        for item in context['categories']:
+            item['category'] = Show.ShowCategories(item['category']).label
+
+        context['request'] = self.request
         return context
+
+    def get_queryset(self):
+        shows = Show.objects.all()
+
+        for genre in self.request.GET.getlist('genre'):
+            shows = shows.filter(genres=genre)
+
+        for tag in self.request.GET.getlist('tag'):
+            shows = shows.filter(tags=tag)
+
+        if 'year' in self.request.GET:
+            shows = shows.filter(year__in=self.request.GET.getlist('year'))
+
+        if 'country' in self.request.GET:
+            shows = shows.filter(country__in=self.request.GET.getlist('country'))
+
+        return shows
 
 
 class SearchShowListView(generic.ListView):

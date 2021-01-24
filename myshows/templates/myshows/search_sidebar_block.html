@@ -79,7 +79,7 @@
                     {% for category in categories %}
                         <div>
                             <input name="category" class="form-check-input me-1" type="checkbox" onChange="this.form.submit()" value="{{ category.category }}" aria-label="..." {% if category.category in request.GET|get_list:"category" %}checked="checked"{% endif %}>
-                            <a class="list-group-item-action" href="{% url 'all' %}?category={{ category.category }}">{{ category.category }} : {{ category.shows_count }}</a>
+                            <a class="list-group-item-action" href="{% url 'all' %}?category={{ category.category }}">{{ category.category_label }} : {{ category.shows_count }}</a>
                         </div>
                     {% endfor %}
                 </div>

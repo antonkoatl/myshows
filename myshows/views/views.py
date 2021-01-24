@@ -40,7 +40,7 @@ class ShowListView(generic.ListView):
         context['categories'] = Show.objects.values('category').annotate(shows_count=Count('category')).order_by('-shows_count')
 
         for item in context['categories']:
-            item['category'] = Show.ShowCategories(item['category']).label
+            item['category_label'] = Show.ShowCategories(item['category']).label
 
         context['request'] = self.request
         return context
@@ -59,6 +59,9 @@ class ShowListView(generic.ListView):
 
         if 'country' in self.request.GET:
             shows = shows.filter(country__in=self.request.GET.getlist('country'))
+
+        if 'category' in self.request.GET:
+            shows = shows.filter(category__in=self.request.GET.getlist('category'))
 
         return shows
 

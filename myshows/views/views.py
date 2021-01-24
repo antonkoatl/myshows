@@ -28,6 +28,11 @@ class ShowListView(generic.ListView):
     model = Show
     paginate_by = 20
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'all'
+        return context
+
 
 class SearchShowListView(generic.ListView):
     paginate_by = 20
@@ -41,7 +46,20 @@ class NewsListView(generic.ListView):
     model = Article
     paginate_by = 20
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'news'
+        return context
+
 
 class NewsDetailView(generic.DetailView):
     model = Article
 
+
+class RatingsDetailView(generic.TemplateView):
+    template_name = "ratings.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'ratings'
+        return context

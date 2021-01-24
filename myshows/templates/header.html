@@ -9,8 +9,9 @@
             </div>
             <div class="nav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'all' %}">Сериалы</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'news' %}">Новости</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active == 'all' %} active{% endif %}" href="{% url 'all' %}">Сериалы</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active == 'news' %} active{% endif %}" href="{% url 'news' %}">Новости</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active == 'ratings' %} active{% endif %}" href="{% url 'ratings' %}">Рейтинги</a></li>
                 </ul>
             </div>
             <form class="d-flex" action="{% url 'search' %}" method="get">

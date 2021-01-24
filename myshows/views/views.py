@@ -53,6 +53,9 @@ class ShowListView(generic.ListView):
     def get_queryset(self):
         shows = Show.objects.all()
 
+        if 'q' in self.request.GET:
+            shows = shows.filter(title_ru__icontains=self.request.GET['q'])
+
         for genre in self.request.GET.getlist('genre'):
             shows = shows.filter(genres=genre)
 
@@ -72,14 +75,6 @@ class ShowListView(generic.ListView):
             shows = shows.filter(type__in=self.request.GET.getlist('type'))
 
         return shows
-
-
-class SearchShowListView(generic.ListView):
-    paginate_by = 20
-
-    def get_queryset(self):
-        query = self.request.GET['q']
-        return Show.objects.filter(title_ru__icontains=query)
 
 
 class NewsListView(generic.ListView):

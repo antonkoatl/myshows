@@ -11,6 +11,10 @@ class Country(models.Model):
     def __str__(self):
         return str(self.name_ru)
 
+    class Meta:
+        verbose_name = _(u"Country")
+        verbose_name_plural = _(u"Countries")
+
 
 class Network(models.Model):
     title = models.CharField(max_length=200)
@@ -134,6 +138,12 @@ class Season(models.Model):
     description = models.TextField()
     trailer = models.TextField()
 
+    def __str__(self):
+        return f'Season[{self.number}]'
+
+    class Meta:
+        ordering = ['-number', ]
+
 
 class Episode(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
@@ -141,6 +151,9 @@ class Episode(models.Model):
     number = models.IntegerField()
     air_date = models.DateTimeField(null=True)
     is_special = models.BooleanField()
+
+    def __str__(self):
+        return f'Episode[{self.number}]'
 
 
 class EpisodeImage(models.Model):

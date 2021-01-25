@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     # ex: /myshows/5/
     path('<int:pk>/', views.ShowDetailView.as_view(), name='detail'),
+    # ex: /myshows/5/1/
+    path('<int:pk>/<int:season_number>/', views.ShowDetailView.as_view(), name='detail_season'),
     # ex: /myshows/search/
     path('search/', views.ShowListView.as_view(), name='search'),
     # ex: /myshows/all/

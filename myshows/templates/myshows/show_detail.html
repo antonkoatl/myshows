@@ -61,3 +61,11 @@
         </div>
     </div>
 {% endblock %}
+{% block sidebar %}
+    <h4>Сезоны</h4>
+    <div class="list-group">
+        {% for season_item in object.season_set.all %}
+            <a href="{% url 'detail_season' object.id season_item.number %}" class="list-group-item list-group-item-action{% if season_item == season %} active{% endif %}" aria-current="true">{{ season_item.number }}</a>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -19,6 +19,13 @@ class ShowDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['posters'] = Poster.objects.filter(show=self.object)
+
+        if 'season_number' in self.kwargs:
+            season = self.object.season_set.filter(number=self.kwargs['season_number']).first()
+        else:
+            season = self.object.season_set.order_by('-number').first()
+        context['season'] = season
+
         return context
 
     def get_object(self):

@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag, Episode
+from myshows.models import Show, Poster, Article, Country, Genre, Tag, Episode, EpisodeImage
 
 
 def index(request):
@@ -159,21 +159,21 @@ class TriviaView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['active'] = 'trivia'
 
-        episodes = []
-        max_id = Episode.objects.last().id
+        shows = []
+        max_id = Show.objects.last().id
 
 
-        while len(episodes) < 4:
+        while len(shows) < 4:
             pk = random.randrange(max_id)
-            ep = Episode.objects.filter(pk=pk)
-            if ep.exists() and ep.get().episodeimage_set.first(): episodes.append(ep.get())
+            var = Show.objects.filter(pk=pk)
+            if var.exists() and Episode.objects.filter(season__show=var.get()).exists(): shows.append(var.get())
 
-        correct = random.choice(episodes)
-        random.shuffle(episodes)
-        variants = [x.season.show.title_ru for x in episodes]
+        correct = random.choice(shows)
+        random.shuffle(shows)
+        variants = [x.title_ru for x in shows]
 
         context['question'] = {
-            'image': correct.episodeimage_set.first().image,
+            'image': EpisodeImage.objects.filter(episode__season__show=correct).order_by('?').first().image,
             'variants': variants
         }
 
@@ -182,7 +182,7 @@ class TriviaView(generic.TemplateView):
 
         context['score'] = self.request.session['score']
 
-        self.request.session['correct'] = correct.season.show.title_ru
-        self.request.session['correct_answer'] = episodes.index(correct)
+        self.request.session['correct'] = correct.title_ru
+        self.request.session['correct_answer'] = shows.index(correct)
 
         return context

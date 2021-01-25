@@ -67,11 +67,10 @@ class Show(models.Model):
     category = models.CharField(max_length=4, choices=ShowCategories.choices)
     type = models.CharField(max_length=4, choices=ShowTypes.choices)
     country = models.ManyToManyField(Country)
-    started = models.DateField()
-    ended = models.DateField(null=True)
+    started = models.DateTimeField()
+    ended = models.DateTimeField(null=True)
     runtime_one = models.DurationField()
     runtime_total = models.DurationField(null=True)
-    runtime_total_str = models.CharField(max_length=200)
     genres = models.ManyToManyField(Genre)
     tags = models.ManyToManyField(Tag)
     network = models.ForeignKey(Network, null=True, on_delete=models.PROTECT)
@@ -124,3 +123,26 @@ class Article(models.Model):
 class ArticleImage(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images')
+
+
+class Season(models.Model):
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    number = models.IntegerField()
+    episodes_count = models.IntegerField()
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField(null=True)
+    description = models.TextField()
+    trailer = models.TextField()
+
+
+class Episode(models.Model):
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    number = models.IntegerField()
+    air_date = models.DateTimeField(null=True)
+    is_special = models.BooleanField()
+
+
+class EpisodeImage(models.Model):
+    episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='episode')

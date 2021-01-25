@@ -166,7 +166,7 @@ class TriviaView(generic.TemplateView):
         while len(shows) < 4:
             pk = random.randrange(max_id)
             var = Show.objects.filter(pk=pk)
-            if var.exists() and Episode.objects.filter(season__show=var.get()).exists(): shows.append(var.get())
+            if var.exists() and EpisodeImage.objects.filter(episode__season__show=var.get()).exists(): shows.append(var.get())
 
         correct = random.choice(shows)
         random.shuffle(shows)

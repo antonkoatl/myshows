@@ -5,15 +5,18 @@
 {% endblock %}
 
 {% block sidebar %}
-    <table class="table">
-        <tbody>
-            {% for show in shows %}
-                <tr>
-                    <td>
-                        <a class="btn btn-light" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="">
+        <h4>Топ</h4>
+        {% for show in shows %}
+            <div class="p-1">
+                <div class="float-end">
+                    <span class="text-black-50 fs-9">{{ show.myshows_watching }} смотрящих</span>
+                </div>
+                <div>
+                    <a class="link-dark" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
+                    <sup class="fs-9">{{ show.myshows_rating }}</sup>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

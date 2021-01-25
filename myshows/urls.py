@@ -19,4 +19,8 @@ urlpatterns = [
     path('news/<int:pk>/', views.NewsDetailView.as_view(), name='news_detail'),
     # ex: /myshows/ratings/
     path('ratings/', views.RatingsDetailView.as_view(), name='ratings'),
+    # ex: /myshows/trivia/
+    path('trivia/', views.TriviaView.as_view(), name='trivia'),
+    # ex: /myshows/trivia/check
+    path('trivia/check', views.check_trivia, name='check_trivia'),
 ]

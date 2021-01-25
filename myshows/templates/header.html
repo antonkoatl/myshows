@@ -12,6 +12,7 @@
                     <li class="nav-item"><a class="nav-link{% if active == 'all' %} active{% endif %}" href="{% url 'all' %}">Сериалы</a></li>
                     <li class="nav-item"><a class="nav-link{% if active == 'news' %} active{% endif %}" href="{% url 'news' %}">Новости</a></li>
                     <li class="nav-item"><a class="nav-link{% if active == 'ratings' %} active{% endif %}" href="{% url 'ratings' %}">Рейтинги</a></li>
+                    <li class="nav-item"><a class="nav-link{% if active == 'trivia' %} active{% endif %}" href="{% url 'trivia' %}">Викторина</a></li>
                 </ul>
             </div>
             <form class="d-flex" action="{% url 'search' %}" method="get">

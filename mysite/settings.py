@@ -130,3 +130,6 @@ STATICFILES_DIRS = (
 )
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
 MEDIA_URL = '/media/'  # URL для медии в шаблонах
+
+CSRF_USE_SESSIONS = True
+CSRF_COOKIE_HTTPONLY = True

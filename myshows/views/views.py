@@ -1,9 +1,12 @@
+import random
+
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag
+from myshows.models import Show, Poster, Article, Country, Genre, Tag, Episode
 
 
 def index(request):
@@ -11,6 +14,24 @@ def index(request):
     news = Article.objects.all()
     page = request.GET.get('page', 1)
     return render(request, 'index.html', context={'shows': shows, 'news_list': Paginator(news, 5).page(page)})
+
+
+def check_trivia(request):
+    correct = request.session['correct']
+    answer = request.POST['answer']
+
+    if answer == correct:
+        if 'score' in request.session:
+            request.session['score'] += 1
+        else:
+            request.session['score'] = 1
+        return JsonResponse({'result': True, 'score': request.session['score']}, status=200)
+    else:
+        if 'score' in request.session:
+            request.session['score'] -= 1
+        else:
+            request.session['score'] = -1
+        return JsonResponse({'result': False, 'score': request.session['score']}, status=200)
 
 
 class ShowDetailView(generic.DetailView):
@@ -127,5 +148,40 @@ class RatingsDetailView(generic.TemplateView):
             'data': Tag.objects.filter(show__myshows_rating__isnull=False).annotate(
                 shows_data=Avg('show__myshows_rating')).order_by('-shows_data')[:5].prefetch_related('show_set')
         }
+
+        return context
+
+
+class TriviaView(generic.TemplateView):
+    template_name = "trivia.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'trivia'
+
+        episodes = []
+        max_id = Episode.objects.last().id
+
+
+        while len(episodes) < 4:
+            pk = random.randrange(max_id)
+            ep = Episode.objects.filter(pk=pk)
+            if ep.exists() and ep.get().episodeimage_set.first(): episodes.append(ep.get())
+
+        correct = random.choice(episodes)
+        random.shuffle(episodes)
+        variants = [x.season.show.title_ru for x in episodes]
+
+        context['question'] = {
+            'image': correct.episodeimage_set.first().image,
+            'variants': variants
+        }
+
+        if 'score' not in self.request.session:
+            self.request.session['score'] = 0
+
+        context['score'] = self.request.session['score']
+
+        self.request.session['correct'] = correct.season.show.title_ru
 
         return context

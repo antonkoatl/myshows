@@ -31,7 +31,7 @@ def check_trivia(request):
             request.session['score'] -= 1
         else:
             request.session['score'] = -1
-        return JsonResponse({'result': False, 'score': request.session['score']}, status=200)
+        return JsonResponse({'result': False, 'score': request.session['score'], 'correct_answer': request.session['correct_answer']}, status=200)
 
 
 class ShowDetailView(generic.DetailView):
@@ -183,5 +183,6 @@ class TriviaView(generic.TemplateView):
         context['score'] = self.request.session['score']
 
         self.request.session['correct'] = correct.season.show.title_ru
+        self.request.session['correct_answer'] = episodes.index(correct)
 
         return context

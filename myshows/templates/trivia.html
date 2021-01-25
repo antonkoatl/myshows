@@ -27,8 +27,9 @@
                     $(this).addClass('list-group-item-success');
                 } else {
                     $(this).addClass('list-group-item-danger');
+                    $('#answer' + response['correct_answer']).addClass('list-group-item-success');
                 }
-                location.reload();
+                setTimeout(function(){ location.reload(); }, 1000);
             },
             error: function(e) {
                 alert("Error: " + e);

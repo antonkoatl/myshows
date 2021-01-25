@@ -14,6 +14,7 @@
     <script>
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     function checkAnswer() {
+        $('#simpleList').off();
         $.ajax({
             method: "POST",
             url: "{% url 'check_trivia' %}",

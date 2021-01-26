@@ -23,4 +23,7 @@ urlpatterns = [
     path('trivia/', views.TriviaView.as_view(), name='trivia'),
     # ex: /myshows/trivia/check
     path('trivia/check', views.check_trivia, name='check_trivia'),
+
+    # ex: /myshows/test
+    path('test/', views.TestView.as_view(), name='test'),
 ]

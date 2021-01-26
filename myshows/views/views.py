@@ -192,3 +192,7 @@ class TriviaView(generic.TemplateView):
         self.request.session['correct_answer'] = shows.index(correct)
 
         return context
+
+
+class TestView(generic.TemplateView):
+    template_name = 'test.html'

@@ -19,6 +19,8 @@
 
         function checkAnswer() {
             $('#simpleList').off();
+            need_to_update = true;
+
             $.ajax({
                 method: "POST",
                 url: "{% url 'check_trivia' %}",
@@ -35,7 +37,6 @@
                         $('#answer' + response['correct_answer']).addClass('list-group-item-success');
                     }
                     $('#score').text(response['score']);
-                    need_to_update = true;
                     setTimeout(function(){
                         if (need_to_update) {
                             need_to_update = false;

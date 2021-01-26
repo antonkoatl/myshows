@@ -190,11 +190,11 @@ class TriviaView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['active'] = 'trivia'
 
-        mode = self.request.GET.get('mode', 'all')
-        question = get_new_question(mode)
-
         if 'trivia' not in self.request.session:
             self.request.session['trivia'] = {'score': 0}
+
+        mode = self.request.session['trivia'].get('mode', 'all')
+        question = get_new_question(mode)
 
         context['mode'] = mode
         context['score'] = self.request.session['trivia']['score']

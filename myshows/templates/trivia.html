@@ -3,7 +3,7 @@
 {% block content %}
     {% csrf_token %}
     <div class="col" style="width: 700px; height: 400px">
-        <img src="{{ question.image.url }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
+        <img id="question_img" src="{{ question.image }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
     </div>
     <div class="row" style="width: 700px">
         <ul id="simpleList" class="list-group list-group-horizontal">
@@ -14,45 +14,113 @@
         </ul>
     </div>
     <script>
-    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    function checkAnswer() {
-        $('#simpleList').off();
-        $.ajax({
-            method: "POST",
-            url: "{% url 'check_trivia' %}",
-            headers: {'X-CSRFToken': csrftoken},
-            data: {
-                answer: $(this).text(),
-            },
-            context: this,
-            success: function(response) {
-                if (response['result']) {
-                    $(this).addClass('list-group-item-success');
-                } else {
-                    $(this).addClass('list-group-item-danger');
-                    $('#answer' + response['correct_answer']).addClass('list-group-item-success');
-                }
-                setTimeout(function(){ location.reload(); }, 1000);
-            },
-            error: function(e) {
-                alert("Error: " + e);
-            }
-        });
-    }
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        var need_to_update = false;
 
-    $("#simpleList").on('click', 'li', checkAnswer);
-</script>
+        function checkAnswer() {
+            $('#simpleList').off();
+            $.ajax({
+                method: "POST",
+                url: "{% url 'check_trivia' %}",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    answer: $(this).text(),
+                },
+                context: this,
+                success: function(response) {
+                    if (response['result']) {
+                        $(this).addClass('list-group-item-success');
+                    } else {
+                        $(this).addClass('list-group-item-danger');
+                        $('#answer' + response['correct_answer']).addClass('list-group-item-success');
+                    }
+                    $('#score').text(response['score']);
+                    need_to_update = true;
+                    setTimeout(function(){
+                        if (need_to_update) {
+                            need_to_update = false;
+                            $('#question_img').attr('src', response['question']['image']);
+                            $('#answer0').text(response['question']['variants'][0]);
+                            $('#answer0').removeClass('list-group-item-success');
+                            $('#answer0').removeClass('list-group-item-danger');
+                            $('#answer1').text(response['question']['variants'][1]);
+                            $('#answer1').removeClass('list-group-item-success');
+                            $('#answer1').removeClass('list-group-item-danger');
+                            $('#answer2').text(response['question']['variants'][2]);
+                            $('#answer2').removeClass('list-group-item-success');
+                            $('#answer2').removeClass('list-group-item-danger');
+                            $('#answer3').text(response['question']['variants'][3]);
+                            $('#answer3').removeClass('list-group-item-success');
+                            $('#answer3').removeClass('list-group-item-danger');
+                            $("#simpleList").on('click', 'li', checkAnswer);
+                        }
+                    }, 1000);
+                },
+                error: function(e) {
+                    alert("Error: " + e);
+                }
+            });
+        }
+
+        $("#simpleList").on('click', 'li', checkAnswer);
+    </script>
 {% endblock %}
 
 {% block sidebar %}
-    <h4>Счёт: <span class="badge bg-danger">{{ score }}</span></h4>
+    <h4>Счёт: <span id="score" class="badge bg-danger">{{ score }}</span></h4>
     <h4>Режим</h4>
-    <div class="list-group">
-        <a href="{% url 'trivia' %}?mode=all" class="list-group-item list-group-item-action{% if mode == 'all' %} active{% endif %}" aria-current="true">Все</a>
-        <a href="{% url 'trivia' %}?mode=shows" class="list-group-item list-group-item-action{% if mode == 'shows' %} active{% endif %}" aria-current="true">Сериалы</a>
-        <a href="{% url 'trivia' %}?mode=cartoon" class="list-group-item list-group-item-action{% if mode == 'cartoon' %} active{% endif %}" aria-current="true">Мультфильмы</a>
-        <a href="{% url 'trivia' %}?mode=anime" class="list-group-item list-group-item-action{% if mode == 'anime' %} active{% endif %}" aria-current="true">Аниме</a>
-        <a href="{% url 'trivia' %}?mode=russia" class="list-group-item list-group-item-action{% if mode == 'russia' %} active{% endif %}" aria-current="true">Россия</a>
-        <a href="{% url 'trivia' %}?mode=america" class="list-group-item list-group-item-action{% if mode == 'america' %} active{% endif %}" aria-current="true">Америка</a>
-    </div>
+    <ul id="modeList" class="list-group">
+        <li class="list-group-item list-group-item-action{% if mode == 'all' %} active{% endif %}" aria-current="true" value="all">Все</li>
+        <li class="list-group-item list-group-item-action{% if mode == 'shows' %} active{% endif %}" aria-current="true" value="shows">Сериалы</li>
+        <li class="list-group-item list-group-item-action{% if mode == 'cartoon' %} active{% endif %}" aria-current="true" value="cartoon">Мультфильмы</li>
+        <li class="list-group-item list-group-item-action{% if mode == 'anime' %} active{% endif %}" aria-current="true" value="anime">Аниме</li>
+        <li class="list-group-item list-group-item-action{% if mode == 'russia' %} active{% endif %}" aria-current="true" value="russia">Россия</li>
+        <li class="list-group-item list-group-item-action{% if mode == 'america' %} active{% endif %}" aria-current="true" value="america">Америка</li>
+    </ul>
+    <script>
+        function switchMode() {
+            var mode = $(this).attr("value");
+            $.ajax({
+                method: "POST",
+                url: "{% url 'check_trivia' %}",
+                headers: {'X-CSRFToken': csrftoken},
+                data: {
+                    mode: mode,
+                },
+                context: this,
+                success: function(response) {
+                    if (need_to_update) {
+                        need_to_update = false;
+                        $("#simpleList").on('click', 'li', checkAnswer);
+                    }
+                    $("#modeList li").each(function(idx, li) {
+                            $(li).removeClass('active');
+                            if ($(li).attr('value') == mode) {
+                                $(li).addClass('active');
+                            };
+                        }
+                    );
+
+                    $('#question_img').attr('src', response['question']['image']);
+                    $('#answer0').text(response['question']['variants'][0]);
+                    $('#answer0').removeClass('list-group-item-success');
+                    $('#answer0').removeClass('list-group-item-danger');
+                    $('#answer1').text(response['question']['variants'][1]);
+                    $('#answer1').removeClass('list-group-item-success');
+                    $('#answer1').removeClass('list-group-item-danger');
+                    $('#answer2').text(response['question']['variants'][2]);
+                    $('#answer2').removeClass('list-group-item-success');
+                    $('#answer2').removeClass('list-group-item-danger');
+                    $('#answer3').text(response['question']['variants'][3]);
+                    $('#answer3').removeClass('list-group-item-success');
+                    $('#answer3').removeClass('list-group-item-danger');
+                },
+                error: function(e) {
+                    alert("Error: " + e);
+                }
+            });
+        }
+
+        $("#modeList").on('click', 'li', switchMode);
+    </script>
 {% endblock %}

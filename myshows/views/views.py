@@ -1,11 +1,54 @@
-import random
-
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag, EpisodeImage
+from myshows.models import Show, Poster, Article, Country, Genre, Tag
+from myshows.utils.trivia_helper import get_new_question
+
+
+def check_trivia(request):
+    result = {}
+
+    if 'answer' in request.POST:
+        correct = request.session['trivia']['question']['text_correct']
+        answer = request.POST['answer']
+
+        if answer == correct:
+            request.session['trivia']['score'] += 1
+            result['result'] = True
+        else:
+            request.session['trivia']['score'] -= 1
+            result['result'] = False
+
+        result['score'] = request.session['trivia']['score']
+        result['correct_answer'] = request.session['trivia']['question']['correct_answer_num']
+
+        mode = request.session['trivia']['mode']
+        new_queston = get_new_question(mode)
+        request.session['trivia']['question'] = new_queston
+
+        result['question'] = {
+                'image': new_queston['image_url'],
+                'variants': new_queston['text_variants']
+            }
+
+        request.session.modified = True
+
+    elif 'mode' in request.POST:
+        mode = request.POST['mode']
+        request.session['trivia']['mode'] = mode
+        new_queston = get_new_question(mode)
+        request.session['trivia']['question'] = new_queston
+
+        result['question'] = {
+            'image': new_queston['image_url'],
+            'variants': new_queston['text_variants']
+        }
+
+        request.session.modified = True
+
+    return JsonResponse(result, status=200)
 
 
 class IndexView(generic.TemplateView):
@@ -20,24 +63,6 @@ class IndexView(generic.TemplateView):
         context['shows'] = shows
         context['news'] = Paginator(news, 5).page(page)
         return context
-
-
-def check_trivia(request):
-    correct = request.session['correct']
-    answer = request.POST['answer']
-
-    if answer == correct:
-        if 'score' in request.session:
-            request.session['score'] += 1
-        else:
-            request.session['score'] = 1
-        return JsonResponse({'result': True, 'score': request.session['score']}, status=200)
-    else:
-        if 'score' in request.session:
-            request.session['score'] -= 1
-        else:
-            request.session['score'] = -1
-        return JsonResponse({'result': False, 'score': request.session['score'], 'correct_answer': request.session['correct_answer']}, status=200)
 
 
 class ShowDetailView(generic.DetailView):
@@ -165,38 +190,22 @@ class TriviaView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['active'] = 'trivia'
 
-        shows = []
-        max_id = Show.objects.last().id
         mode = self.request.GET.get('mode', 'all')
+        question = get_new_question(mode)
+
+        if 'trivia' not in self.request.session:
+            self.request.session['trivia'] = {'score': 0}
+
         context['mode'] = mode
-
-        shows = Show.objects.all()
-
-        if mode == 'shows': shows = shows.filter(category=Show.ShowCategories.FILM)
-        elif mode == 'cartoon': shows = shows.filter(category=Show.ShowCategories.CARTOON)
-        elif mode == 'anime': shows = shows.filter(category=Show.ShowCategories.ANIME)
-        elif mode == 'russia': shows = shows.filter(country__name_short='RU')
-        elif mode == 'america': shows = shows.filter(country__name_short='US')
-
-        shows_with_images = list(shows.filter(season__episode__episodeimage__isnull=False).distinct().values_list('pk', 'title_ru'))
-        shows = random.sample(shows_with_images, 4)
-        correct = random.choice(shows)
-
-        variants = [x[1] for x in shows]
-
+        context['score'] = self.request.session['trivia']['score']
         context['question'] = {
-            'image': EpisodeImage.objects.filter(episode__season__show=correct[0]).order_by('?').first().image,
-            'variants': variants
+            'image': question['image_url'],
+            'variants': question['text_variants']
         }
 
-        if 'score' not in self.request.session:
-            self.request.session['score'] = 0
-
-        context['score'] = self.request.session['score']
-
-        self.request.session['correct'] = correct[1]
-        self.request.session['correct_answer'] = shows.index(correct)
-
+        self.request.session['trivia']['mode'] = mode
+        self.request.session['trivia']['question'] = question
+        self.request.session.modified = True
         return context
 
 

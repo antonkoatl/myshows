@@ -3,17 +3,23 @@ import random
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag, Episode, EpisodeImage
+from myshows.models import Show, Poster, Article, Country, Genre, Tag, EpisodeImage
 
 
-def index(request):
-    shows = Show.objects.order_by('-myshows_rating').all()[:10]
-    news = Article.objects.all()
-    page = request.GET.get('page', 1)
-    return render(request, 'index.html', context={'shows': shows, 'news_list': Paginator(news, 5).page(page)})
+class IndexView(generic.TemplateView):
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        shows = Show.objects.order_by('-myshows_rating').all()[:10]
+        news = Article.objects.all()
+        page = self.request.GET.get('page', 1)
+
+        context['shows'] = shows
+        context['news'] = Paginator(news, 5).page(page)
+        return context
 
 
 def check_trivia(request):
@@ -196,3 +202,7 @@ class TriviaView(generic.TemplateView):
 
 class TestView(generic.TemplateView):
     template_name = 'test.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

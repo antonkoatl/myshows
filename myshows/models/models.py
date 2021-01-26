@@ -64,6 +64,7 @@ class Show(models.Model):
 
     title_original = models.CharField(max_length=200)
     title_ru = models.CharField(max_length=200, blank=True)
+    slogan = models.CharField(max_length=300, blank=True)
     broadcast_status = models.CharField(max_length=3, default=BroadcastStatus.UNKNOWN, choices=BroadcastStatus.choices)
     seasons_total = models.IntegerField()
     year = models.IntegerField()
@@ -78,6 +79,7 @@ class Show(models.Model):
     genres = models.ManyToManyField(Genre)
     tags = models.ManyToManyField(Tag)
     network = models.ForeignKey(Network, null=True, on_delete=models.PROTECT)
+    age_limit = models.IntegerField(default=0)
 
     myshows_id = models.IntegerField(null=True)
     myshows_watching = models.IntegerField(null=True)
@@ -104,6 +106,7 @@ class Poster(models.Model):
     image = models.ImageField(upload_to='poster')
     upload_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     upload_time = models.DateTimeField(auto_now_add=True)
+    country = models.ForeignKey(Country, default=1, on_delete=models.SET_DEFAULT)
 
 
 class Article(models.Model):
@@ -147,10 +150,12 @@ class Season(models.Model):
 
 class Episode(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, null=True)
+    title_ru = models.CharField(max_length=200, null=True)
     number = models.IntegerField()
     air_date = models.DateTimeField(null=True)
     is_special = models.BooleanField()
+    synopsis = models.CharField(max_length=2000, null=True)
 
     def __str__(self):
         return f'Episode[{self.number}]'
@@ -159,3 +164,11 @@ class Episode(models.Model):
 class EpisodeImage(models.Model):
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='episode')
+
+
+class Fact(models.Model):
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    string = models.CharField(max_length=3000)
+
+    def __str__(self):
+        return f'{self.show}:{self.string[:20]}'

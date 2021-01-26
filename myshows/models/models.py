@@ -139,7 +139,7 @@ class Season(models.Model):
     trailer = models.TextField()
 
     def __str__(self):
-        return f'Season[{self.number}]'
+        return f'Season[{self.show}:{self.number}]'
 
     class Meta:
         ordering = ['-number', ]

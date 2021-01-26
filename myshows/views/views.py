@@ -161,19 +161,25 @@ class TriviaView(generic.TemplateView):
 
         shows = []
         max_id = Show.objects.last().id
+        mode = self.request.GET.get('mode', 'all')
+        context['mode'] = mode
 
+        shows = Show.objects.all()
 
-        while len(shows) < 4:
-            pk = random.randrange(max_id)
-            var = Show.objects.filter(pk=pk)
-            if var.exists() and EpisodeImage.objects.filter(episode__season__show=var.get()).exists(): shows.append(var.get())
+        if mode == 'shows': shows = shows.filter(category=Show.ShowCategories.FILM)
+        elif mode == 'cartoon': shows = shows.filter(category=Show.ShowCategories.CARTOON)
+        elif mode == 'anime': shows = shows.filter(category=Show.ShowCategories.ANIME)
+        elif mode == 'russia': shows = shows.filter(country__name_short='RU')
+        elif mode == 'america': shows = shows.filter(country__name_short='US')
 
+        shows_with_images = list(shows.filter(season__episode__episodeimage__isnull=False).distinct().values_list('pk', 'title_ru'))
+        shows = random.sample(shows_with_images, 4)
         correct = random.choice(shows)
-        random.shuffle(shows)
-        variants = [x.title_ru for x in shows]
+
+        variants = [x[1] for x in shows]
 
         context['question'] = {
-            'image': EpisodeImage.objects.filter(episode__season__show=correct).order_by('?').first().image,
+            'image': EpisodeImage.objects.filter(episode__season__show=correct[0]).order_by('?').first().image,
             'variants': variants
         }
 
@@ -182,7 +188,7 @@ class TriviaView(generic.TemplateView):
 
         context['score'] = self.request.session['score']
 
-        self.request.session['correct'] = correct.title_ru
+        self.request.session['correct'] = correct[1]
         self.request.session['correct_answer'] = shows.index(correct)
 
         return context

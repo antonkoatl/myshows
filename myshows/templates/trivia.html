@@ -44,4 +44,13 @@
 
 {% block sidebar %}
     <h4>Счёт: <span class="badge bg-danger">{{ score }}</span></h4>
+    <h4>Режим</h4>
+    <div class="list-group">
+        <a href="{% url 'trivia' %}?mode=all" class="list-group-item list-group-item-action{% if mode == 'all' %} active{% endif %}" aria-current="true">Все</a>
+        <a href="{% url 'trivia' %}?mode=shows" class="list-group-item list-group-item-action{% if mode == 'shows' %} active{% endif %}" aria-current="true">Сериалы</a>
+        <a href="{% url 'trivia' %}?mode=cartoon" class="list-group-item list-group-item-action{% if mode == 'cartoon' %} active{% endif %}" aria-current="true">Мультфильмы</a>
+        <a href="{% url 'trivia' %}?mode=anime" class="list-group-item list-group-item-action{% if mode == 'anime' %} active{% endif %}" aria-current="true">Аниме</a>
+        <a href="{% url 'trivia' %}?mode=russia" class="list-group-item list-group-item-action{% if mode == 'russia' %} active{% endif %}" aria-current="true">Россия</a>
+        <a href="{% url 'trivia' %}?mode=america" class="list-group-item list-group-item-action{% if mode == 'america' %} active{% endif %}" aria-current="true">Америка</a>
+    </div>
 {% endblock %}

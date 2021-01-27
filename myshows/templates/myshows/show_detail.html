@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-sm">
                 <div class="row" style="width:300px;">
-                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" style="background-color:#f8edeb">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="10000" style="background-color:#f8edeb">
                         <ol class="carousel-indicators">
                             {% for poster in posters %}
                                 <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == 0%} class="active"{% endif %}></li>
@@ -66,6 +66,12 @@
     <div class="list-group">
         {% for season_item in object.season_set.all %}
             <a href="{% url 'detail_season' object.id season_item.number %}" class="list-group-item list-group-item-action{% if season_item == season %} active{% endif %}" aria-current="true">{{ season_item.number }}</a>
+        {% endfor %}
+    </div>
+    <h4>Эпизоды</h4>
+    <div class="list-group">
+        {% for episode_item in season.episode_set.all %}
+            <div class="list-group-item list-group-item-action{% if season_item == season %} active{% endif %}" aria-current="true">{{ episode_item.number }} : {{ episode_item.get_title }}</div>
         {% endfor %}
     </div>
 {% endblock %}

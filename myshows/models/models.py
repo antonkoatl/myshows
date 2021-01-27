@@ -166,6 +166,14 @@ class Episode(models.Model):
     def __str__(self):
         return f'Episode[{self.number}]'
 
+    class Meta:
+        ordering = ['-number', ]
+
+    def get_title(self):
+        if self.title_ru is not None: return self.title_ru
+        elif self.title is not None: return self.title
+        else: return ""
+
 
 class EpisodeImage(models.Model):
     episode = models.ForeignKey(Episode, on_delete=models.CASCADE)

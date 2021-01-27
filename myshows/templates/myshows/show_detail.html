@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-sm">
                 <div class="row" style="width:300px;">
-                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" style="background-color:#f8edeb">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000" style="background-color:#f8edeb">
                         <ol class="carousel-indicators">
                             {% for poster in posters %}
                                 <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == 0%} class="active"{% endif %}></li>

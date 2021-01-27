@@ -3,7 +3,7 @@
 {% block content %}
     {% for show in page_obj %}
         <div class="row">
-            <div class="col" style="max-width:400px;"><img src="{{ show.poster_set.first.image.url }}" class="img-thumbnail" alt="..."></div>
+            <div class="col" style="max-width:200px;"><img src="{{ show.poster_set.first.image.url }}" class="img-thumbnail" alt="..."></div>
             <div class="col"><a class="fs-4 btn btn-light" href="{% url 'detail' show.id %}">{{ show.get_title_ru }}</a></div>
         </div>
     {% endfor %}

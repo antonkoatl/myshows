@@ -17,12 +17,11 @@ def get_new_question(mode):
     elif mode == 'america':
         shows = shows.filter(country__name_short='US')
 
-    shows_with_images = list(
-        shows.filter(season__episode__episodeimage__isnull=False).distinct().values_list('pk', 'title_ru'))
+    shows_with_images = list(shows.filter(season__episode__episodeimage__isnull=False).distinct().values_list('pk', 'title_ru'))
     shows = random.sample(shows_with_images, 4)
     correct = random.choice(shows)
 
-    variants = [x[1] for x in shows]
+    variants = [Show.get_title_static(x[1]) for x in shows]
 
     return {
         'image_url': EpisodeImage.objects.filter(episode__season__show=correct[0]).order_by('?').first().image.url,

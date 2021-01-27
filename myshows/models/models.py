@@ -96,6 +96,12 @@ class Show(models.Model):
     imdb_rating = models.IntegerField(null=True)
     imdb_voted = models.IntegerField(null=True)
 
+    def get_title_ru(self):
+        return self.title_ru.split('::')[0]
+
+    @staticmethod
+    def get_title_static(title):
+        return title.split('::')[0]
 
     def __str__(self):
         return f'Show[{self.title_original}]'

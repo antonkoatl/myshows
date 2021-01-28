@@ -164,7 +164,7 @@ class Episode(models.Model):
     synopsis = models.CharField(max_length=2000, null=True)
 
     def __str__(self):
-        return f'Episode[{self.number}]'
+        return f'Episode[{self.season.show.get_title_ru()} : {self.season.number} : {self.number} {self.title_ru}]'
 
     class Meta:
         ordering = ['-number', ]
@@ -180,9 +180,35 @@ class EpisodeImage(models.Model):
     image = models.ImageField(upload_to='episode')
 
 
+class EpisodeComment(models.Model):
+    episode = models.ForeignKey(Episode, on_delete=models.CASCADE)
+    user_name = models.CharField(max_length=200)
+    comment = models.TextField(max_length=5000)
+    created_at = models.DateTimeField()
+    rating = models.IntegerField()
+    dost_positive = models.FloatField()
+    dost_neutral = models.FloatField()
+    dost_negative = models.FloatField()
+
+
 class Fact(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     string = models.CharField(max_length=3000)
 
     def __str__(self):
         return f'{self.show}:{self.string[:20]}'
+
+
+class Review(models.Model):
+
+    class ReviewType(models.TextChoices):
+        POSITIVE = "p", _("Позитивный")
+        NEGATIVE = "n", _("Негативный")
+        NEUTRAL = "u", _("Нейтральный")
+
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    type = models.CharField(max_length=1, choices=ReviewType.choices, null=True)
+    date = models.DateTimeField(null=True)
+    author = models.CharField(max_length=200)
+    title = models.CharField(max_length=1000, null=True)
+    description = models.TextField()

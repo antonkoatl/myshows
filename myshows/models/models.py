@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
 
 
@@ -173,6 +174,16 @@ class Episode(models.Model):
         if self.title_ru is not None: return self.title_ru
         elif self.title is not None: return self.title
         else: return ""
+
+    def get_comments_temperature(self):
+        temp_avg = self.episodecomment_set.aggregate(Avg('dost_positive'), Avg('dost_neutral'), Avg('dost_negative'))
+        temp_sum = sum(filter(None, temp_avg.values()))
+        for k in temp_avg:
+            if temp_avg[k] is not  None:
+                temp_avg[k] = temp_avg[k] / temp_sum
+            else:
+                temp_avg[k] = ''
+        return temp_avg
 
 
 class EpisodeImage(models.Model):

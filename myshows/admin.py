@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country, Network, Season, Episode, EpisodeImage
+from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country, Network, Season, Episode, EpisodeImage, \
+    EpisodeComment
 
 admin.site.register(Poster)
 admin.site.register(EpisodeImage)
@@ -8,49 +9,38 @@ admin.site.register(ArticleImage)
 admin.site.register(Network)
 
 
+@admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('title_ru', 'id',)
     filter_horizontal = ('country', 'genres', 'tags')
 
 
-admin.site.register(Show, ShowAdmin)
-
-
+@admin.register(Genre)
 class GenresAdmin(admin.ModelAdmin):
     list_display = ('title', 'id',)
 
 
-admin.site.register(Genre, GenresAdmin)
-
-
+@admin.register(Tag)
 class TagsAdmin(admin.ModelAdmin):
     list_display = ('title', 'id',)
 
 
-admin.site.register(Tag, TagsAdmin)
-
-
+@admin.register(Article)
 class ArticlesAdmin(admin.ModelAdmin):
     list_display = ('id', 'title',)
 
 
-admin.site.register(Article, ArticlesAdmin)
-
-
+@admin.register(Country)
 class CountriesAdmin(admin.ModelAdmin):
     list_display = ('id', 'name_ru', 'name_short')
 
 
-admin.site.register(Country, CountriesAdmin)
-
-
+@admin.register(Season)
 class SeasonsAdmin(admin.ModelAdmin):
     list_display = ('show', 'number', 'id')
 
 
-admin.site.register(Season, SeasonsAdmin)
-
-
+@admin.register(Episode)
 class EpisodesAdmin(admin.ModelAdmin):
     list_display = ('get_show', 'get_season_number', 'number', 'title', 'id')
 
@@ -65,4 +55,6 @@ class EpisodesAdmin(admin.ModelAdmin):
     get_season_number.short_description = 'Season'
 
 
-admin.site.register(Episode, EpisodesAdmin)
+@admin.register(EpisodeComment)
+class EpisodeCommentsAdmin(admin.ModelAdmin):
+    raw_id_fields = ['episode']

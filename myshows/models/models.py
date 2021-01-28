@@ -3,6 +3,8 @@ from django.db import models
 from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
 
+from myshows.utils.sentimental import dostoevsky_analyze
+
 
 class Country(models.Model):
     name_short = models.CharField(max_length=2)
@@ -168,7 +170,7 @@ class Episode(models.Model):
     synopsis = models.CharField(max_length=2000, null=True)
 
     def __str__(self):
-        return f'Episode[{self.season.show.get_title_ru()} : {self.season.number} : {self.number} {self.title_ru}]'
+        return f'Episode[{self.season.show.get_title_ru()} : {self.season.number} : {self.number} {self.get_title()}]'
 
     class Meta:
         ordering = ['-number', ]
@@ -203,6 +205,13 @@ class EpisodeComment(models.Model):
     dost_positive = models.FloatField()
     dost_neutral = models.FloatField()
     dost_negative = models.FloatField()
+
+    def save(self, *args, **kwargs):
+        results = dostoevsky_analyze(self.comment)
+        self.dost_positive = results['positive']
+        self.dost_neutral = results['neutral']
+        self.dost_negative = results['negative']
+        super(EpisodeComment, self).save(*args, **kwargs)
 
 
 class Fact(models.Model):

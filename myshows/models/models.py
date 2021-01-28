@@ -117,6 +117,9 @@ class Poster(models.Model):
 
 
 class Article(models.Model):
+    class Meta:
+        ordering = ['-published_at', ]
+
     class ArticleCategories(models.TextChoices):
         TRAILER = "trailer", _("Трейлер")
         ANNOUNCE = "anonsy", _("Анонс")

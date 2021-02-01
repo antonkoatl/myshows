@@ -3,7 +3,7 @@ from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag
+from myshows.models import Show, Poster, Article, Country, Genre, Tag, PersonRole
 from myshows.utils.trivia_helper import get_new_question
 
 
@@ -77,6 +77,8 @@ class ShowDetailView(generic.DetailView):
         else:
             season = self.object.season_set.order_by('-number').first()
         context['season'] = season
+
+        context['actor_roles'] = self.object.personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]
 
         return context
 

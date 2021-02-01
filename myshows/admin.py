@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country, Network, Season, Episode, EpisodeImage, \
-    EpisodeComment
+    EpisodeComment, PersonRole, Person, PersonSpouse
 
 admin.site.register(Poster)
 admin.site.register(EpisodeImage)
@@ -15,19 +15,9 @@ class ShowAdmin(admin.ModelAdmin):
     filter_horizontal = ('country', 'genres', 'tags')
 
 
-@admin.register(Genre)
-class GenresAdmin(admin.ModelAdmin):
-    list_display = ('title', 'id',)
-
-
-@admin.register(Tag)
-class TagsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'id',)
-
-
-@admin.register(Article)
-class ArticlesAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title',)
+@admin.register(Genre, Tag, Article)
+class SimpleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'id']
 
 
 @admin.register(Country)
@@ -58,3 +48,20 @@ class EpisodesAdmin(admin.ModelAdmin):
 @admin.register(EpisodeComment)
 class EpisodeCommentsAdmin(admin.ModelAdmin):
     raw_id_fields = ['episode']
+
+
+@admin.register(Person)
+class PersonsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'name_ru', 'id',)
+    search_fields = ['name', 'name_ru']
+
+
+@admin.register(PersonRole)
+class GenresAdmin(admin.ModelAdmin):
+    list_display = ('person', 'role', 'show', 'id',)
+
+
+@admin.register(PersonSpouse)
+class PersonSpousesAdmin(admin.ModelAdmin):
+    list_display = ('person1', 'person2', 'id',)
+    autocomplete_fields = ['person1', 'person2']

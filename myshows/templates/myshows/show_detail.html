@@ -46,6 +46,9 @@
                 <div class="fs-4"><span class="badge bg-light text-dark">Тэги:</span>
                     {% for tag in object.tags.all %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?tag={{ tag.id }}">{{ tag.title }}</a>{% endfor %}</div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Формат:</span><a class="fs-6 link-dark" href="{% url 'all' %}?category={{ object.category }}">{{ object.get_category_display }}</a>, <a class="fs-6 link-dark" href="{% url 'all' %}?type={{ object.type }}">{{ object.get_type_display }}</a></div>
+                <div class="fs-4"><span class="badge bg-light text-dark">Режиссёр:</span>
+                    {% for role in object.personrole_set.all %}{% if role.role == "director" %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?person={{ role.person.id }}">{{ role.person.get_name }}</a>{% endif %}{% endfor %}
+                </div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Канал:</span> {{ object.network }}</div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Сезонов:</span> {{ object.seasons_total }}</div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Общая длительность:</span> {{ object.runtime_total }}</div>
@@ -58,6 +61,30 @@
         </div>
         <div class="row">
             <p>{{ object.description|safe }}</p>
+        </div>
+        <div class="row">
+            <h4>Актёры</h4>
+            <div class="list-group list-group-horizontal">
+                {% for role in actor_roles %}
+                    <div class="list-group-item list-group-item-action" aria-current="true">
+                        <div class="d-flex justify-content-center">
+                            {% if role.person.animated_poster %}
+                            <video width="150" autoplay muted loop>
+                                <source src="{{ role.person.animated_poster.url }}" type="video/mp4">
+                                Your browser does not support HTML video.
+                            </video>
+                            {% else %}
+                                {% if role.person.personimage_set.count > 0 %}
+                                    <img src="{{ role.person.personimage_set.first.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                                {% else %}
+                                    <img src="/media/empty.jpg" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div>{{ role.person.get_name }} : {{ role.description }}</div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

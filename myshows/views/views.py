@@ -11,8 +11,8 @@ def check_trivia(request):
     result = {}
 
     if 'answer' in request.POST:
-        correct = request.session['trivia']['question']['text_correct']
-        answer = request.POST['answer']
+        correct = request.session['trivia']['question']['correct_answer_num']
+        answer = int(request.POST['answer'])
 
         if answer == correct:
             request.session['trivia']['score'] += 1
@@ -25,12 +25,13 @@ def check_trivia(request):
         result['correct_answer'] = request.session['trivia']['question']['correct_answer_num']
 
         mode = request.session['trivia']['mode']
-        new_queston = get_new_question(mode)
-        request.session['trivia']['question'] = new_queston
+        new_question = get_new_question(mode)
+        request.session['trivia']['question'] = new_question
 
         result['question'] = {
-                'image': new_queston['image_url'],
-                'variants': new_queston['text_variants']
+                'type':  new_question['type'],
+                'image': new_question['image_url'],
+                'variants': new_question['text_variants']
             }
 
         request.session.modified = True
@@ -38,12 +39,13 @@ def check_trivia(request):
     elif 'mode' in request.POST:
         mode = request.POST['mode']
         request.session['trivia']['mode'] = mode
-        new_queston = get_new_question(mode)
-        request.session['trivia']['question'] = new_queston
+        new_question = get_new_question(mode)
+        request.session['trivia']['question'] = new_question
 
         result['question'] = {
-            'image': new_queston['image_url'],
-            'variants': new_queston['text_variants']
+            'type': new_question['type'],
+            'image': new_question['image_url'],
+            'variants': new_question['text_variants']
         }
 
         request.session.modified = True
@@ -201,6 +203,7 @@ class TriviaView(generic.TemplateView):
         context['mode'] = mode
         context['score'] = self.request.session['trivia']['score']
         context['question'] = {
+            'type': question['type'],
             'image': question['image_url'],
             'variants': question['text_variants']
         }

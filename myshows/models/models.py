@@ -100,7 +100,7 @@ class Show(models.Model):
     imdb_voted = models.IntegerField(null=True)
 
     def get_title_ru(self):
-        return self.title_ru.split('::')[0]
+        return self.get_title_static(self.title_ru)
 
     @staticmethod
     def get_title_static(title):
@@ -303,3 +303,6 @@ class PersonRole(models.Model):
     role = models.CharField(max_length=10, choices=RoleType.choices)
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     description = models.CharField(max_length=200, null=True)
+
+    def __str__(self):
+        return f'{self.person} {self.role} {self.show}'

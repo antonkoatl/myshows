@@ -57,8 +57,9 @@ class PersonsAdmin(admin.ModelAdmin):
 
 
 @admin.register(PersonRole)
-class GenresAdmin(admin.ModelAdmin):
+class PersonRolesAdmin(admin.ModelAdmin):
     list_display = ('person', 'role', 'show', 'id',)
+    autocomplete_fields = ['person']
 
 
 @admin.register(PersonSpouse)

@@ -184,10 +184,10 @@ class Episode(models.Model):
         temp_avg = self.episodecomment_set.aggregate(Avg('dost_positive'), Avg('dost_neutral'), Avg('dost_negative'))
         temp_sum = sum(filter(None, temp_avg.values()))
         for k in temp_avg:
-            if temp_avg[k] is not  None:
+            if temp_avg[k] is not None:
                 temp_avg[k] = temp_avg[k] / temp_sum
             else:
-                temp_avg[k] = ''
+                temp_avg[k] = 0
         return temp_avg
 
 

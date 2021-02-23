@@ -8,3 +8,8 @@ register = template.Library()
 @register.filter
 def get_list(query_dict, item_to_get):
     return query_dict.getlist(item_to_get)
+
+
+@register.filter
+def percentage(value, div=1):
+    return str(100 * value / div if div != 0 else 0)

@@ -2,6 +2,8 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.5.1.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+<link rel="stylesheet" href="{% static 'tiny-slider/tiny-slider.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'tiny-slider/css/styles.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}" />
 <html lang="en" class="h-100">
 <head>
@@ -9,16 +11,18 @@
 </head>
 
 <body class="d-flex flex-column h-100">
+    <script src="{% static "bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+    <script src="{% static 'tiny-slider/tiny-slider.js' %}"></script>
     {% include "header.html" %}
 
     <main class="container">
         <div class="row">
             <!-- MAIN -->
-            <div class="col">
+            <div class="col-lg-9">
                 {% block content %}{% endblock %}
             </div>
             <!-- ASIDE -->
-            <div class="col-3">
+            <div class="col-lg-3">
                 <div class="row">
                     <!-- ASIDE #1 -->
                     <aside class="col-sm-6 col-md-12">
@@ -33,6 +37,5 @@
         </div>
     </main>
     {% include "footer.html" %}
-    <script src="{% static "bootstrap/js/bootstrap.bundle.min.js" %}"></script>
 </body>
 </html>

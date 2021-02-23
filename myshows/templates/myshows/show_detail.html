@@ -3,15 +3,9 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-sm">
+            <div class="col-md-auto">
                 <div class="row" style="width:300px;">
                     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="10000" style="background-color:#f8edeb">
-                        <ol class="carousel-indicators">
-                            {% for poster in posters %}
-                                <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == 0%} class="active"{% endif %}></li>
-                            {% endfor %}
-                        </ol>
-
                         <div class="carousel-inner rounded">
                             {% for poster in posters %}
                                 <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}">
@@ -28,9 +22,6 @@
                             <span class="visually-hidden">Next</span>
                         </a>
                     </div>
-                </div>
-                <div class="row">
-                    trailer
                 </div>
             </div>
             <div class="col">
@@ -59,6 +50,30 @@
 
             </div>
         </div>
+        <div class="row row-cols-2">
+            <div class="col">
+                <div class="carousel" id="customize-controls">
+                    <a class="carousel-control-prev" role="button" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" role="button" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </a>
+                    <div class="my-slider" style="">
+                        {% for episode in season.episode_set.all %}
+                            {% if episode.episodeimage_set.exists %}
+                                <div>
+                                    <img class="tns-lazy-img" data-src="{{ episode.episodeimage_set.first.image.url }}" class="" alt="..." style="">
+                                </div>
+                            {%  endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col">video</div>
+        </div>
         <div class="row">
             <p>{{ object.description|safe }}</p>
         </div>
@@ -66,10 +81,10 @@
             <h4>Актёры</h4>
             <div class="list-group list-group-horizontal">
                 {% for role in actor_roles %}
-                    <div class="list-group-item list-group-item-action" aria-current="true">
+                    <div class="list-group-item list-group-item-action p-1" aria-current="true">
                         <div class="d-flex justify-content-center">
                             {% if role.person.animated_poster %}
-                            <video width="150" autoplay muted loop>
+                            <video width="120" autoplay muted loop>
                                 <source src="{{ role.person.animated_poster.url }}" type="video/mp4">
                                 Your browser does not support HTML video.
                             </video>
@@ -87,6 +102,24 @@
             </div>
         </div>
     </div>
+    <script>
+        var slider = tns({
+            container: '.my-slider',
+            items: 1,
+            lazyload: true,
+            mouseDrag: true,
+            nav: false,
+            gutter: 10,
+            edgePadding: 20,
+            controlsContainer: "#customize-controls",
+            preventScrollOnTouch: 'force',
+            responsive: {
+                1024: {
+                    "items": 2
+                }
+            },
+        });
+    </script>
 {% endblock %}
 {% block sidebar %}
     <h4>Сезоны</h4>

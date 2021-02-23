@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -107,3 +109,21 @@ class Review(models.Model):
     author = models.CharField(max_length=200)
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField()
+
+
+class ShowVideo(models.Model):
+    class VideoType(models.TextChoices):
+        TRAILER = "trailer", _("Трейлер")
+        TEASER = "teaser", _("Тизер")
+        FRAGMENT = "fragment", _("Фрагмент")
+
+    embed_html = models.TextField()
+    type = models.CharField(max_length=10, choices=VideoType.choices)
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+
+
+    def get_embed_fit(self):
+        html = self.embed_html
+        html = re.sub(r'(^<iframe.*width=")(\d+)+("[^>]*>)', lambda x: x[1] + '100%' + x[3], html)
+        html = re.sub(r'(^<iframe.*height=")(\d+)+("[^>]*>)', lambda x: x[1] + '100%' + x[3], html)
+        return html

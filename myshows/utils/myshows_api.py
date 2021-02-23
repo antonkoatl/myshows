@@ -5,9 +5,9 @@ from datetime import datetime
 
 import requests
 from django.core.files import File
+from django.contrib.auth.models import User
 
-from myshows.models import Article, User
-from myshows.models.article import ArticleImage
+from myshows.models.article import ArticleImage, Article
 
 url = 'https://api.myshows.me/v2/rpc/'
 headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}

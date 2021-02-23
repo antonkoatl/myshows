@@ -72,7 +72,23 @@
                     </div>
                 </div>
             </div>
-            <div class="col">video</div>
+            <div class="col">
+                <div class="carousel" id="customize-controls2">
+                    <a class="carousel-control-prev" role="button" data-bs-slide="prev" style="height: fit-content; top: 50%; background-color: indianred;">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    </a>
+                    <a class="carousel-control-next" role="button" data-bs-slide="next" style="height: fit-content; top: 50%; background-color: indianred;">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    </a>
+                    <div class="my-slider-video" style="">
+                        {% for video in show.showvideo_set.all %}
+                            <div>
+                                {{ video.get_embed_fit|safe }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
             <p>{{ object.description|safe }}</p>
@@ -112,6 +128,22 @@
             gutter: 10,
             edgePadding: 20,
             controlsContainer: "#customize-controls",
+            preventScrollOnTouch: 'force',
+            responsive: {
+                1024: {
+                    "items": 2
+                }
+            },
+        });
+        var slider2 = tns({
+            container: '.my-slider-video',
+            items: 1,
+            mouseDrag: true,
+            lazyload: true,
+            nav: false,
+            gutter: 10,
+            edgePadding: 20,
+            controlsContainer: "#customize-controls2",
             preventScrollOnTouch: 'force',
             responsive: {
                 1024: {

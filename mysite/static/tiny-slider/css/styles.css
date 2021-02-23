@@ -51,11 +51,11 @@ img:not(.tns-lazy-img), .lazyload img { height: auto; }
 }
 
 /* nav */
-.nav.active ul { left: 0; }
-.nav.active .nav-toggle-handle { left: 17em; }
-.nav.active .nav-toggle-handle:before { display: inline-block; }
-.nav.active .nav-toggle-handle:after { display: none; }
-.nav ul {
+.nav-ts.active ul { left: 0; }
+.nav-ts.active .nav-ts-toggle-handle { left: 17em; }
+.nav-ts.active .nav-ts-toggle-handle:before { display: inline-block; }
+.nav-ts.active .nav-ts-toggle-handle:after { display: none; }
+.nav-ts ul {
   position: fixed;
   top: 0;
   left: -17em;
@@ -69,18 +69,18 @@ img:not(.tns-lazy-img), .lazyload img { height: auto; }
   transition: left 0.25s;
   overflow-y: auto;
 }
-.nav a {
+.nav-ts a {
   display: block;
   padding: 0.7em 1em;
   color: inherit;
   text-decoration: none;
 }
-.nav a:hover { background-color: #F3F3F3; }
-.nav .active {
+.nav-ts a:hover { background-color: #F3F3F3; }
+.nav-ts .active {
   color: #fff;
   background-color: #af23ff !important;
 }
-.nav-toggle-handle {
+.nav-ts-toggle-handle {
   position: fixed;
   transition: left 0.25s;
   left: 0;
@@ -91,13 +91,13 @@ img:not(.tns-lazy-img), .lazyload img { height: auto; }
   background-color: #af23ff;
   cursor: pointer;
 }
-.nav-toggle-handle:before { 
+.nav-ts-toggle-handle:before {
   display: none;
   padding-right: 5px;
   content: '◄'; 
   font-size: 0.8em;
 }
-.nav-toggle-handle:after { 
+.nav-ts-toggle-handle:after {
   padding-left: 5px;
   content: '►'; 
   font-size: 0.8em;

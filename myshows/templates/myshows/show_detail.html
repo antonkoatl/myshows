@@ -47,7 +47,7 @@
                     {% for tag in object.tags.all %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?tag={{ tag.id }}">{{ tag.title }}</a>{% endfor %}</div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Формат:</span><a class="fs-6 link-dark" href="{% url 'all' %}?category={{ object.category }}">{{ object.get_category_display }}</a>, <a class="fs-6 link-dark" href="{% url 'all' %}?type={{ object.type }}">{{ object.get_type_display }}</a></div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Режиссёр:</span>
-                    {% for role in object.personrole_set.all %}{% if role.role == "director" %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?person={{ role.person.id }}">{{ role.person.get_name }}</a>{% endif %}{% endfor %}
+                    {% for role in object.directors %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'all' %}?person={{ role.person.id }}">{{ role.person.get_name }}</a>{% endfor %}
                 </div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Канал:</span> {{ object.network }}</div>
                 <div class="fs-6"><span class="badge bg-light text-dark">Сезонов:</span> {{ object.seasons_total }}</div>

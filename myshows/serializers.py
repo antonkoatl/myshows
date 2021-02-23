@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from myshows.models import Show
+from myshows.models.show import Show
 
 
 class ShowSerializer(serializers.ModelSerializer):

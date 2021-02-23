@@ -62,7 +62,7 @@ def process_db():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mysite.settings')
     django.setup()
 
-    from myshows.models import Show
+    from myshows.models.show import Show
 
     for i, show in enumerate(Show.objects.order_by('pk')):
         for person_role in show.personrole_set.filter(role='actor')[:5]:

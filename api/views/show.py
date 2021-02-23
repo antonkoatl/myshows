@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from api.common import StandardPageNumberPagination
-from myshows.models import Show
+from myshows.models.show import Show
 from myshows.serializers import ShowSerializer
 
 

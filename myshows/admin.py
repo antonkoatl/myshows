@@ -1,7 +1,11 @@
 from django.contrib import admin
 
-from .models import Show, Poster, Genre, Tag, Article, ArticleImage, Country, Network, Season, Episode, EpisodeImage, \
-    EpisodeComment, PersonRole, Person, PersonSpouse
+from .models import Genre, Tag, Country, Network
+from .models.article import Article, ArticleImage
+from .models.person import Person, PersonSpouse, PersonRole
+from .models.episode import Episode, EpisodeImage, EpisodeComment
+from .models.season import Season
+from .models.show import Show, Poster
 
 admin.site.register(Poster)
 admin.site.register(EpisodeImage)

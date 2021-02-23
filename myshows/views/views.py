@@ -3,7 +3,10 @@ from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
 from django.views import generic
 
-from myshows.models import Show, Poster, Article, Country, Genre, Tag, PersonRole
+from myshows.models import Country, Genre, Tag
+from myshows.models.article import Article
+from myshows.models.person import PersonRole
+from myshows.models.show import Poster, Show
 from myshows.utils.trivia_helper import get_new_question
 
 

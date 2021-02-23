@@ -2,7 +2,9 @@ import random
 
 from django.db.models import Count
 
-from myshows.models import Show, EpisodeImage, PersonRole, PersonImage
+from myshows.models.person import PersonRole
+from myshows.models.episode import EpisodeImage
+from myshows.models.show import Show
 
 
 def get_new_question(mode):

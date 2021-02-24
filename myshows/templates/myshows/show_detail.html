@@ -65,7 +65,7 @@
                         {% for episode in season.episode_set.all %}
                             {% if episode.episodeimage_set.exists %}
                                 <div>
-                                    <img class="tns-lazy-img" data-src="{{ episode.episodeimage_set.first.image.url }}" class="" alt="..." style="">
+                                    <img class="tns-lazy-img" data-src="{{ episode.episodeimage_set.first.image.url }}" class="" alt="..." style="max-width: 100%;">
                                 </div>
                             {%  endif %}
                         {% endfor %}

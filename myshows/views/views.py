@@ -1,3 +1,4 @@
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
@@ -222,7 +223,12 @@ class NamedEntityView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active'] = 'news'
+
+        similary_entities = NamedEntity.objects.annotate(
+            similarity=TrigramSimilarity('lemma', self.object.lemma)).order_by('-similarity')[1:10]
+
+        context['similary_entities'] = similary_entities
+
         return context
 
 

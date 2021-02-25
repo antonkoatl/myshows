@@ -9,4 +9,8 @@
         {% endif %}
         ">{{ occurence.content_object }}</a>
     {% endfor %}
+    <br>Similar:<br>
+    {% for entity in similary_entities %}
+        <a href="{% url 'named_entity' entity.id %}">{{ entity.lemma }} {{ entity.get_type_display }}</a><br>
+    {% endfor %}
 {% endblock %}

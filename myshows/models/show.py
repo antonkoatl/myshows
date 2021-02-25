@@ -92,6 +92,7 @@ class Poster(models.Model):
 class Fact(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     string = models.CharField(max_length=3000)
+    string_marked = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.show}:{self.string[:20]}'
@@ -110,6 +111,10 @@ class Review(models.Model):
     author = models.CharField(max_length=200)
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField()
+    description_marked = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title + " " + str(self.show)
 
 
 class ShowVideo(models.Model):

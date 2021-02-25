@@ -1,16 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {{ object.lemma }}<br>{{ object.get_type_display }}<hr>
+    {{ object.name }}<br>{{ object.get_type_display }}<hr>
     {% for occurence in object.namedentityoccurrence_set.all %}
-        <a href="
-        {% if occurence.content_type.model == "show" %}{% url 'detail' occurence.object_id %}
-        {% elif occurence.content_type.model == "article" %}{% url 'news' occurence.object_id %}
+        {% if occurence.content_type.model == "show" %}
+            <a href="{% url 'detail' occurence.object_id %}">{{ occurence.content_object.get_title_ru }}</a>
+        {% elif occurence.content_type.model == "article" %}
+            <a href="{% url 'news_detail' occurence.object_id %}">{{ occurence.content_object }}</a>
+        {% elif occurence.content_type.model == "fact" %}
+            <a href="{% url 'detail' occurence.content_object.show.id %}">{{ occurence.content_object.show.get_title_ru }}</a>
+            {{ occurence.content_object.string_marked|safe }}
+        {% elif occurence.content_type.model == "review" %}
+            <a href="{% url 'detail' occurence.content_object.show.id %}">{{ occurence.content_object.show.get_title_ru }}</a>
+            {{ occurence.content_object.title }}
+        {% else %}
+            {{ occurence.content_object }}
         {% endif %}
-        ">{{ occurence.content_object }}</a>
+        <br>
     {% endfor %}
-    <br>Similar:<br>
+{% endblock %}
+
+{% block sidebar %}
+    <h4>Похожие:</h4>
     {% for entity in similary_entities %}
-        <a href="{% url 'named_entity' entity.id %}">{{ entity.lemma }} {{ entity.get_type_display }}</a><br>
+        <a href="{% url 'named_entity' entity.id %}">{{ entity.name }} {{ entity.get_type_display }}</a><br>
     {% endfor %}
 {% endblock %}

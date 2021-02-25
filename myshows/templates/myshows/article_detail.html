@@ -47,7 +47,13 @@
             </div>
         </div>
         <div class="row">
-            <p>{{ object.content|safe }}</p>
+            <p>
+                {% if object.content_marked %}
+                    {{ object.content_marked|safe }}
+                {% else %}
+                    {{ object.content|safe }}
+                {% endif %}
+            </p>
         </div>
     </div>
 {% endblock %}

@@ -4,8 +4,9 @@ from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
 from django.views import generic
 
-from myshows.models import Country, Genre, Tag, NamedEntity
+from myshows.models import Country, Genre, Tag
 from myshows.models.article import Article
+from myshows.models.named_entity import NamedEntity
 from myshows.models.person import PersonRole
 from myshows.models.show import Poster, Show
 from myshows.utils.trivia_helper import get_new_question
@@ -225,7 +226,7 @@ class NamedEntityView(generic.DetailView):
         context = super().get_context_data(**kwargs)
 
         similary_entities = NamedEntity.objects.annotate(
-            similarity=TrigramSimilarity('lemma', self.object.lemma)).order_by('-similarity')[1:10]
+            similarity=TrigramSimilarity('name', self.object.name)).exclude(id=self.object.id).order_by('-similarity')[:10]
 
         context['similary_entities'] = similary_entities
 

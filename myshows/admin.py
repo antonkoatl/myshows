@@ -1,12 +1,12 @@
 from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericTabularInline
 
-from .models import Genre, Tag, Country, Network, NamedEntity, NamedEntityOccurrence
+from .models import Genre, Tag, Country, Network
 from .models.article import Article, ArticleImage
+from .models.named_entity import Lemma, NamedEntityOccurrence, NamedEntity
 from .models.person import Person, PersonSpouse, PersonRole
 from .models.episode import Episode, EpisodeImage, EpisodeComment
 from .models.season import Season
-from .models.show import Show, Poster
+from .models.show import Show, Poster, Review
 
 admin.site.register(Poster)
 admin.site.register(EpisodeImage)
@@ -73,15 +73,24 @@ class PersonSpousesAdmin(admin.ModelAdmin):
     autocomplete_fields = ['person1', 'person2']
 
 
+class NamedEntityLemmaInline(admin.TabularInline):
+    model = Lemma
+
+
 class NamedEntityOccurrenceInline(admin.TabularInline):
     model = NamedEntityOccurrence
 
 
 @admin.register(NamedEntity)
 class NamedEntityAdmin(admin.ModelAdmin):
-    list_display = ('lemma', 'type')
-    search_fields = ['lemma']
+    list_display = ('name', 'type')
+    search_fields = ['name']
 
     inlines = [
-        NamedEntityOccurrenceInline,
+        NamedEntityLemmaInline, NamedEntityOccurrenceInline
     ]
+
+
+@admin.register(Review)
+class PersonSpousesAdmin(admin.ModelAdmin):
+    list_display = ('show', 'date', 'title', 'author')

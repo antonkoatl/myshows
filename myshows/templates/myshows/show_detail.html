@@ -91,7 +91,13 @@
             </div>
         </div>
         <div class="row">
-            <p>{{ object.description_marked|safe }}</p>
+            <p>
+                {% if object.description_marked %}
+                    {{ object.description_marked|safe }}
+                {% else %}
+                    {{ object.description|safe }}
+                {% endif %}
+            </p>
         </div>
         <div class="row">
             <h4>Актёры</h4>

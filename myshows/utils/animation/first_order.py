@@ -63,11 +63,12 @@ def process_db():
     django.setup()
 
     from myshows.models.show import Show
+    from myshows.models.person import PersonRole
 
     for i, show in enumerate(Show.objects.order_by('pk')):
-        for person_role in show.personrole_set.filter(role='actor')[:5]:
+        for person_role in show.personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]:
             person = person_role.person
-            if person.animated_poster.name is None and person.personimage_set.count() > 0:
+            if not person.animated_poster.name and person.personimage_set.count() > 0:
                 image_path = person.personimage_set.first().image.path
                 video_path = animate(image_path)
                 person.animated_poster.save(str(person.id) + '.' + video_path.split('.')[-1], File(open(video_path, 'rb')))

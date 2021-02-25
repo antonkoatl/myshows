@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-sm">
+            <div class="col" style="position: relative">
                 <div class="row" style="width:300px;">
                     <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false" style="background-color:#f8edeb">
                         <ol class="carousel-indicators">
@@ -31,7 +31,9 @@
                 </div>
                 {% if object.video %}
                     <div class="row">
-                        {{ object.video|safe }}
+                        <div class="col" style="bottom: 0; position: absolute;">
+                            {{ object.get_embed_fit_video|safe }}
+                        </div>
                     </div>
                 {% endif %}
             </div>

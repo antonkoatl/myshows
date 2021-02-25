@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -23,6 +25,12 @@ class Article(models.Model):
     category = models.CharField(max_length=20, choices=ArticleCategories.choices)
     tags = models.CharField(max_length=1000)
     source = models.CharField(max_length=1000)
+
+    def get_embed_fit_video(self):
+        html = self.video
+        html = re.sub(r'(^<iframe.*width=")(\d+)+("[^>]*>)', lambda x: x[1] + '300' + x[3], html)
+        html = re.sub(r'(^<iframe.*height=")(\d+)+("[^>]*>)', lambda x: x[1] + '100%' + x[3], html)
+        return html
 
     def __str__(self):
         return self.title

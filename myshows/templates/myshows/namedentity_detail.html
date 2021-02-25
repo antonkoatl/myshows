@@ -23,6 +23,6 @@
 {% block sidebar %}
     <h4>Похожие:</h4>
     {% for entity in similary_entities %}
-        <a href="{% url 'named_entity' entity.id %}">{{ entity.name }} {{ entity.get_type_display }}</a><br>
+        <a href="{% url 'named_entity' entity.id %}">{{ entity.name }}</a> {{ entity.get_type_display }}<br>
     {% endfor %}
 {% endblock %}

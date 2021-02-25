@@ -39,6 +39,7 @@ class Show(models.Model):
     seasons_total = models.IntegerField()
     year = models.IntegerField()
     description = models.TextField()
+    description_marked = models.TextField(null=True, blank=True)
     category = models.CharField(max_length=4, choices=ShowCategories.choices)
     type = models.CharField(max_length=4, choices=ShowTypes.choices)
     country = models.ManyToManyField(Country)

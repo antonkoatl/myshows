@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericTabularInline
 
-from .models import Genre, Tag, Country, Network
+from .models import Genre, Tag, Country, Network, NamedEntity, NamedEntityOccurrence
 from .models.article import Article, ArticleImage
 from .models.person import Person, PersonSpouse, PersonRole
 from .models.episode import Episode, EpisodeImage, EpisodeComment
@@ -70,3 +71,17 @@ class PersonRolesAdmin(admin.ModelAdmin):
 class PersonSpousesAdmin(admin.ModelAdmin):
     list_display = ('person1', 'person2', 'id',)
     autocomplete_fields = ['person1', 'person2']
+
+
+class NamedEntityOccurrenceInline(admin.TabularInline):
+    model = NamedEntityOccurrence
+
+
+@admin.register(NamedEntity)
+class NamedEntityAdmin(admin.ModelAdmin):
+    list_display = ('lemma', 'type')
+    search_fields = ['lemma']
+
+    inlines = [
+        NamedEntityOccurrenceInline,
+    ]

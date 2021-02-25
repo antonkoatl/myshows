@@ -3,7 +3,7 @@ from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
 from django.views import generic
 
-from myshows.models import Country, Genre, Tag
+from myshows.models import Country, Genre, Tag, NamedEntity
 from myshows.models.article import Article
 from myshows.models.person import PersonRole
 from myshows.models.show import Poster, Show
@@ -214,6 +214,15 @@ class TriviaView(generic.TemplateView):
         self.request.session['trivia']['mode'] = mode
         self.request.session['trivia']['question'] = question
         self.request.session.modified = True
+        return context
+
+
+class NamedEntityView(generic.DetailView):
+    model = NamedEntity
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'news'
         return context
 
 

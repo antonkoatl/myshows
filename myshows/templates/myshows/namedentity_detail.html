@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {{ object.lemma }}<br>{{ object.get_type_display }}<hr>
+    {% for occurence in object.namedentityoccurrence_set.all %}
+        <a href="
+        {% if occurence.content_type.model == "show" %}{% url 'detail' occurence.object_id %}
+        {% elif occurence.content_type.model == "article" %}{% url 'news' occurence.object_id %}
+        {% endif %}
+        ">{{ occurence.content_object }}</a>
+    {% endfor %}
+{% endblock %}

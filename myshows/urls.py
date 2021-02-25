@@ -23,6 +23,8 @@ urlpatterns = [
     path('trivia/', views.TriviaView.as_view(), name='trivia'),
     # ex: /myshows/trivia/check
     path('trivia/check', views.check_trivia, name='check_trivia'),
+    # ex: /myshows/entity/5/
+    path('entity/<int:pk>/', views.NamedEntityView.as_view(), name='named_entity'),
 
     # ex: /myshows/test
     path('test/', views.TestView.as_view(), name='test'),

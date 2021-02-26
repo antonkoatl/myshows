@@ -9,10 +9,10 @@
                 <hr>
             </div>
         </div>
-        <div id="masonry" class="row row-cols-2">
+        <div id="masonry" class="row">
             {% for show in shows %}
-                <div class="col p-1">
-                    <div class="card">
+                <div class="col-md-6 p-1">
+                    <div class="card" >
                         <div class="row row-cols-2">
                             <div class="col">
                                 <a href="{% url 'detail' show.id %}">
@@ -22,10 +22,12 @@
                                     <h6 class="card-title">{{ show.get_title_ru }}</h6>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                {% for data in show.display_data %}
-                                    <p>...{{ data|safe }}...</p>
-                                {% endfor %}
+                            <div class="col">
+                                <div class="card-body">
+                                    {% for data in show.display_data %}
+                                        <p>...{{ data|safe }}...</p>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -33,7 +35,7 @@
             {% endfor %}
             {% for occurence in object.namedentityoccurrence_set.all %}
                 {% if occurence.content_type.model == "article" %}
-                    <div class="col p-1">
+                    <div class="col-md-6 p-1">
                         <div class="card">
                             <div class="row row-cols-2">
                                 <div class="col" style="max-width: 12rem;">

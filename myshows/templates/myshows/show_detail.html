@@ -106,7 +106,7 @@
                     <div class="list-group-item list-group-item-action p-1" aria-current="true">
                         <div class="d-flex justify-content-center">
                             {% if role.person.animated_poster %}
-                            <video width="120" autoplay muted loop>
+                            <video width="120" autoplay muted loop playsinline muted>
                                 <source src="{{ role.person.animated_poster.url }}" type="video/mp4">
                                 Your browser does not support HTML video.
                             </video>
@@ -121,6 +121,38 @@
                         <div>{{ role.person.get_name }} : {{ role.description }}</div>
                     </div>
                 {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            {% for review in reviews %}
+                <div class="row p-3" id="review-{{ review.id }}">
+                    <h5>{{ review.title }}</h5>
+                    <p>{{ review.date }}</p>
+                    <div>
+                        {% if review.description_marked %}
+                            {{ review.description_marked|safe }}
+                        {% else %}
+                            {{ review.description|safe }}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="pagination">
+                {% if reviews.has_previous %}
+                    <a class="page-link" href="?page=1">&laquo; first</a>
+                    <a class="page-link" href="?page={{ reviews.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">
+                        Page {{ reviews.number }} of {{ reviews.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if reviews.has_next %}
+                    <a class="page-link" href="?page={{ reviews.next_page_number }}">next</a>
+                    <a class="page-link" href="?page={{ reviews.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
             </div>
         </div>
     </div>

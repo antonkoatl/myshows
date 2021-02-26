@@ -87,6 +87,13 @@ class ShowDetailView(generic.DetailView):
 
         context['actor_roles'] = self.object.personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]
 
+        if 'review' in self.request.GET:
+            review_id = self.request.GET['review']
+            context['reviews'] = Paginator(self.object.review_set.filter(id=review_id), 5).page(1)
+        else:
+            page = self.request.GET.get('page', 1)
+            context['reviews'] = Paginator(self.object.review_set.all(), 5).page(page)
+
         return context
 
     def get_object(self):
@@ -238,4 +245,5 @@ class TestView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['actor_roles'] = Show.objects.get(pk=1).personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]
         return context

@@ -1,7 +1,10 @@
 import re
 
+import celery
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 
@@ -21,7 +24,7 @@ class Article(models.Model):
     content_marked = models.TextField(null=True, blank=True)
     published_at = models.DateTimeField()
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    video = models.CharField(max_length=5000, null=True)
+    video = models.CharField(max_length=5000, null=True, blank=True)
     category = models.CharField(max_length=20, choices=ArticleCategories.choices)
     tags = models.CharField(max_length=1000)
     source = models.CharField(max_length=1000)
@@ -34,6 +37,17 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+@receiver(pre_save, sender=Article)
+def update_content_markup(sender, instance: Article, **kwargs):
+    if instance.id is None:  # new object will be created
+        celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.content != instance.content:  # field will be updated
+            instance.content_marked = None
+            celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
 
 
 class ArticleImage(models.Model):

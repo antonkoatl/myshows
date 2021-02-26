@@ -1,7 +1,10 @@
 import re
 
+import celery
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from myshows.models import Country, Genre, Tag, Network
@@ -81,6 +84,17 @@ class Show(models.Model):
         return f'Show[{self.title_original}]'
 
 
+@receiver(pre_save, sender=Show)
+def update_description_markup(sender, instance: Show, **kwargs):
+    if instance.id is None:  # new object will be created
+        celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.description != instance.description:  # field will be updated
+            instance.description_marked = None
+            celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
+
+
 class Poster(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='poster')
@@ -96,6 +110,17 @@ class Fact(models.Model):
 
     def __str__(self):
         return f'{self.show}:{self.string[:20]}'
+
+
+@receiver(pre_save, sender=Fact)
+def update_content_markup_fact(sender, instance: Fact, **kwargs):
+    if instance.id is None:  # new object will be created
+        celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.string != instance.string:  # field will be updated
+            instance.string_marked = None
+            celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
 
 
 class Review(models.Model):
@@ -115,6 +140,17 @@ class Review(models.Model):
 
     def __str__(self):
         return self.title + " " + str(self.show)
+
+
+@receiver(pre_save, sender=Review)
+def update_content_markup_review(sender, instance: Review, **kwargs):
+    if instance.id is None:  # new object will be created
+        celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.description != instance.description:  # field will be updated
+            instance.description_marked = None
+            celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
 
 
 class ShowVideo(models.Model):

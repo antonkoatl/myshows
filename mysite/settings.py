@@ -177,3 +177,6 @@ LOGGING = {
         },
     },
 }
+
+# Celery Configuration Options
+CELERY_WORKER_CONCURRENCY = 1

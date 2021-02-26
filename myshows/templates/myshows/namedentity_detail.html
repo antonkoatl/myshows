@@ -11,8 +11,14 @@
             <a href="{% url 'detail' occurence.content_object.show.id %}">{{ occurence.content_object.show.get_title_ru }}</a>
             {{ occurence.content_object.string_marked|safe }}
         {% elif occurence.content_type.model == "review" %}
-            <a href="{% url 'detail' occurence.content_object.show.id %}?review={{ occurence.content_object.id }}#review-{{ occurence.content_object.id }}">{{ occurence.content_object.show.get_title_ru }}</a>
-            {{ occurence.content_object.title }}
+            {{ occurence.content_object.show.get_title_ru }}
+            <a href="{% url 'detail' occurence.content_object.show.id %}?review={{ occurence.content_object.id }}#review-{{ occurence.content_object.id }}">
+            {% if occurence.content_object.title %}
+                {{ occurence.content_object.title }}
+            {% else %}
+                {{ occurence.content_object.description|slice:":100" }}...
+            {% endif %}
+            </a>
         {% else %}
             {{ occurence.content_object }}
         {% endif %}

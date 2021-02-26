@@ -116,6 +116,8 @@ def parse_ner_soup(text_node, content_object, soup):
             filter(lambda x: x.label_ in ['DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'CARDINAL'], doc_en.ents),
             filter(lambda x: x.label_ == 'MISC', doc_xx.ents))
 
+    ents_all.sort(key=lambda x: x.start_char)
+
     for entity in ents_all:
         entity_db = process_founded_entity(entity, content_object)
 

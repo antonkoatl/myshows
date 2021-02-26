@@ -16,7 +16,7 @@
                         <div class="row row-cols-2">
                             <div class="col">
                                 <a href="{% url 'detail' show.id %}">
-                                    <img class="card-img-top" src="{{ show.poster_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+                                    <img class="card-img-top" src="{{ show.get_poster }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
                                 </a>
                                 <div class="card-body">
                                     <h6 class="card-title">{{ show.get_title_ru }}</h6>

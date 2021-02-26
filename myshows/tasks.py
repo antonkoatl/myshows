@@ -7,11 +7,6 @@ from myshows.models import Show, Article, Fact, Review, NamedEntityOccurrence, N
 from myshows.utils.named_entities import parse_html_text
 
 
-@app.task
-def add(x, y):
-    return x + y
-
-
 def clear_db_entities(content_object):
     NamedEntityOccurrence.objects.filter(
         content_type=ContentType.objects.get_for_model(content_object),

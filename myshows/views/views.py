@@ -7,7 +7,7 @@ from django.views import generic
 
 from myshows.models import Country, Genre, Tag
 from myshows.models.article import Article
-from myshows.models.named_entity import NamedEntity
+from myshows.models.named_entity import NamedEntity, NamedEntityOccurrence
 from myshows.models.person import PersonRole
 from myshows.models.show import Poster, Show, Fact, Review
 from myshows.utils.trivia_helper import get_new_question
@@ -238,9 +238,13 @@ class NamedEntityView(generic.DetailView):
 
         context['similary_entities'] = similary_entities
 
+        page = self.request.GET.get('page', 1)
+        page_obj = Paginator(self.object.namedentityoccurrence_set.all(), 50).page(page)
+        context['page_obj'] = page_obj
+
         shows = {}
 
-        for occurrence in self.object.namedentityoccurrence_set.filter(content_type=ContentType.objects.get_for_model(Fact)):
+        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(content_type=ContentType.objects.get_for_model(Fact)):
             fact = occurrence.content_object
             if fact.show.id not in shows:
                 shows[fact.show.id] = fact.show
@@ -248,7 +252,7 @@ class NamedEntityView(generic.DetailView):
             else:
                 shows[fact.show.id].display_data.append(occurrence.occurrence_context)
 
-        for occurrence in self.object.namedentityoccurrence_set.filter(
+        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(
                 content_type=ContentType.objects.get_for_model(Review)):
             review = occurrence.content_object
             if review.show.id not in shows:
@@ -257,7 +261,7 @@ class NamedEntityView(generic.DetailView):
             else:
                 shows[review.show.id].display_data.append(occurrence.occurrence_context)
 
-        for occurrence in self.object.namedentityoccurrence_set.filter(
+        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(
                 content_type=ContentType.objects.get_for_model(Show)):
             show = occurrence.content_object
             if show.id not in shows:
@@ -267,6 +271,7 @@ class NamedEntityView(generic.DetailView):
                 shows[show.id].display_data.append(occurrence.occurrence_context)
 
         context['shows'] = shows.values()
+
 
 
         return context

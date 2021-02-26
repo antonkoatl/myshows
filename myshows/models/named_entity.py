@@ -32,6 +32,9 @@ class Lemma(models.Model):
 
 
 class NamedEntityOccurrence(models.Model):
+    class Meta:
+        ordering = ['-id']
+
     named_entity = models.ForeignKey(NamedEntity, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()

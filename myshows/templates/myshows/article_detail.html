@@ -50,7 +50,7 @@
         </div>
         <div class="row">
             <p>
-                {% if object.content_marked %}
+                {% if object.content_marked and "raw" not in request.GET %}
                     {{ object.content_marked|safe }}
                 {% else %}
                     {{ object.content|safe }}

@@ -1,3 +1,4 @@
+import math
 import re
 from itertools import chain
 from pprint import pprint
@@ -7,6 +8,7 @@ from bs4 import BeautifulSoup, NavigableString
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
+from myshows.models import Show, Fact, Review, Article
 from myshows.models.named_entity import NamedEntity, NamedEntityOccurrence
 
 nlp_ru = spacy.load("ru_core_news_lg")
@@ -50,9 +52,9 @@ def merge_ents(*doc_ents):
 
 def get_lemma(entity):
     if len(entity.lemma_) > 0:
-        return entity.lemma_.lower()
+        return entity.lemma_.lower().strip()
     else:
-        return entity.text.lower()
+        return entity.text.lower().strip()
 
 
 def parse_ner_text(text, content_object):
@@ -83,25 +85,62 @@ def parse_ner_text(text, content_object):
     return description_marked
 
 
-def process_founded_entity(entity, content_object):
+def get_url_for_named_entity_content(occurrence):
+    url = ''
+    if occurrence.content_type == ContentType.objects.get_for_model(Show):
+        url = reverse("detail", args=[occurrence.object_id])
+    elif occurrence.content_type == ContentType.objects.get_for_model(Fact):
+        url = reverse("detail", args=[occurrence.content_object.show.id])
+    elif occurrence.content_type == ContentType.objects.get_for_model(Review):
+        url = reverse("detail", args=[occurrence.content_object.show.id]) + f"?review={occurrence.object_id}"
+    elif occurrence.content_type == ContentType.objects.get_for_model(Article):
+        url = reverse("news_detail", args=[occurrence.object_id])
+
+    return url + f'#occurrence-{occurrence.id}'
+
+
+def process_founded_entity(entity, content_object, text):
     entity_db = NamedEntity.objects.filter(lemma__lemma=get_lemma(entity)).first()
 
     if not entity_db:
-        entity_db = NamedEntity(name=entity.text,
+        entity_db = NamedEntity(name=entity.text.strip(),
                                 type=NamedEntity.Type(entity_types.get(entity.label_, entity.label_)))
         entity_db.save()
         entity_db.lemma_set.create(lemma=get_lemma(entity))
 
-    occurrence = NamedEntityOccurrence.objects.filter(
+    occurrence_db = NamedEntityOccurrence.objects.filter(
         named_entity=entity_db,
         content_type=ContentType.objects.get_for_model(content_object),
         object_id=content_object.id).first()
 
-    if not occurrence:
-        occurrence = NamedEntityOccurrence(named_entity=entity_db, content_object=content_object)
-        occurrence.save()
+    if not occurrence_db:
+        occurrence_db = NamedEntityOccurrence(
+            named_entity=entity_db,
+            content_object=content_object,
+            occurrence_context='',
+        )
+        occurrence_db.save()
 
-    return entity_db
+        text_context = f'<a href="{get_url_for_named_entity_content(occurrence_db)}" class="badge bg-danger">' + entity.text + '</a>'
+        left_space_half = math.floor(
+            (NamedEntityOccurrence._meta.get_field('occurrence_context').max_length - len(text_context)) / 2)
+        text_context = text[entity.start_char - left_space_half:entity.start_char] + text_context + text[
+                                                                                                    entity.end_char:entity.end_char + left_space_half]
+
+        i = entity.start_char - left_space_half - 1
+        while 0 <= i < entity.start_char and not text[i].isspace():
+            i += 1
+        text_context = text_context[i - (entity.start_char - left_space_half - 1):]
+
+        i = entity.end_char + left_space_half
+        while len(text) > i > entity.end_char and not text[i].isspace():
+            i -= 1
+        text_context = text_context[:-(entity.end_char + left_space_half - i) or None]
+
+        occurrence_db.occurrence_context = text_context
+        occurrence_db.save()
+
+    return entity_db, occurrence_db
 
 
 def parse_ner_soup(text_node, content_object, soup):
@@ -119,10 +158,14 @@ def parse_ner_soup(text_node, content_object, soup):
     ents_all.sort(key=lambda x: x.start_char)
 
     for entity in ents_all:
-        entity_db = process_founded_entity(entity, content_object)
+        entity_db, occurrence_db = process_founded_entity(entity, content_object, text)
 
         text_node.insert_before(text[current_pos:entity.start_char])
-        a_tag = soup.new_tag("a", attrs={"class": "badge bg-info", "href" : reverse("named_entity", args=[entity_db.id])})
+        a_tag = soup.new_tag("a", attrs={
+            "class": "badge bg-info",
+            "href": reverse("named_entity", args=[entity_db.id]),
+            "id": f"occurrence-{occurrence_db.id}"
+        })
         a_tag.string = entity.text
         text_node.insert_before(a_tag)
         current_pos = entity.end_char

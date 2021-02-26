@@ -47,8 +47,8 @@ class Show(models.Model):
     ended = models.DateTimeField(null=True)
     runtime_one = models.DurationField()
     runtime_total = models.DurationField(null=True)
-    genres = models.ManyToManyField(Genre)
-    tags = models.ManyToManyField(Tag)
+    genres = models.ManyToManyField(Genre, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     network = models.ForeignKey(Network, null=True, on_delete=models.PROTECT)
     age_limit = models.IntegerField(default=0)
 

@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Avg
 
-from myshows.models.season import Season
+from myshows.models import Season
 from myshows.utils.sentimental import dostoevsky_analyze
 
 

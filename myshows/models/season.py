@@ -1,6 +1,6 @@
 from django.db import models
 
-from myshows.models.show import Show
+from myshows.models import Show
 
 
 class Season(models.Model):

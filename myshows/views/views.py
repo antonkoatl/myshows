@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
@@ -8,7 +9,7 @@ from myshows.models import Country, Genre, Tag
 from myshows.models.article import Article
 from myshows.models.named_entity import NamedEntity
 from myshows.models.person import PersonRole
-from myshows.models.show import Poster, Show
+from myshows.models.show import Poster, Show, Fact, Review
 from myshows.utils.trivia_helper import get_new_question
 
 
@@ -236,6 +237,37 @@ class NamedEntityView(generic.DetailView):
             similarity=TrigramSimilarity('name', self.object.name)).exclude(id=self.object.id).order_by('-similarity')[:10]
 
         context['similary_entities'] = similary_entities
+
+        shows = {}
+
+        for occurrence in self.object.namedentityoccurrence_set.filter(content_type=ContentType.objects.get_for_model(Fact)):
+            fact = occurrence.content_object
+            if fact.show.id not in shows:
+                shows[fact.show.id] = fact.show
+                shows[fact.show.id].display_data = [occurrence.occurrence_context]
+            else:
+                shows[fact.show.id].display_data.append(occurrence.occurrence_context)
+
+        for occurrence in self.object.namedentityoccurrence_set.filter(
+                content_type=ContentType.objects.get_for_model(Review)):
+            review = occurrence.content_object
+            if review.show.id not in shows:
+                shows[review.show.id] = review.show
+                shows[review.show.id].display_data = [occurrence.occurrence_context]
+            else:
+                shows[review.show.id].display_data.append(occurrence.occurrence_context)
+
+        for occurrence in self.object.namedentityoccurrence_set.filter(
+                content_type=ContentType.objects.get_for_model(Show)):
+            show = occurrence.content_object
+            if show.id not in shows:
+                shows[show.id] = show
+                shows[show.id].display_data = [occurrence.occurrence_context]
+            else:
+                shows[show.id].display_data.append(occurrence.occurrence_context)
+
+        context['shows'] = shows.values()
+
 
         return context
 

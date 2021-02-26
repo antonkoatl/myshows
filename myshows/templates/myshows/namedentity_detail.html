@@ -1,29 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {{ object.name }}<br>{{ object.get_type_display }}<hr>
-    {% for occurence in object.namedentityoccurrence_set.all %}
-        {% if occurence.content_type.model == "show" %}
-            <a href="{% url 'detail' occurence.object_id %}">{{ occurence.content_object.get_title_ru }}</a>
-        {% elif occurence.content_type.model == "article" %}
-            <a href="{% url 'news_detail' occurence.object_id %}">{{ occurence.content_object }}</a>
-        {% elif occurence.content_type.model == "fact" %}
-            <a href="{% url 'detail' occurence.content_object.show.id %}">{{ occurence.content_object.show.get_title_ru }}</a>
-            {{ occurence.content_object.string_marked|safe }}
-        {% elif occurence.content_type.model == "review" %}
-            {{ occurence.content_object.show.get_title_ru }}
-            <a href="{% url 'detail' occurence.content_object.show.id %}?review={{ occurence.content_object.id }}#review-{{ occurence.content_object.id }}">
-            {% if occurence.content_object.title %}
-                {{ occurence.content_object.title }}
-            {% else %}
-                {{ occurence.content_object.description|slice:":100" }}...
-            {% endif %}
-            </a>
-        {% else %}
-            {{ occurence.content_object }}
-        {% endif %}
-        <br>
-    {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h4>{{ object.name }}</h4>
+                <h5>{{ object.get_type_display }}</h5>
+                <hr>
+            </div>
+        </div>
+        <div id="masonry" class="row row-cols-2">
+            {% for show in shows %}
+                <div class="col p-1">
+                    <div class="card">
+                        <div class="row row-cols-2">
+                            <div class="col">
+                                <a href="{% url 'detail' show.id %}">
+                                    <img class="card-img-top" src="{{ show.poster_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+                                </a>
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ show.get_title_ru }}</h6>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                {% for data in show.display_data %}
+                                    <p>...{{ data|safe }}...</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% for occurence in object.namedentityoccurrence_set.all %}
+                {% if occurence.content_type.model == "article" %}
+                    <div class="col p-1">
+                        <div class="card">
+                            <div class="row row-cols-2">
+                                <div class="col" style="max-width: 12rem;">
+                                    <a href="{% url 'news_detail' occurence.object_id %}">
+                                        <img class="card-img-top" src="{{ occurence.content_object.articleimage_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+                                    </a>
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ occurence.content_object.title }}</h6>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <p>...{{ occurence.occurrence_context|safe }}...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block sidebar %}

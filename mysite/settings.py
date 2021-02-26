@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'myshows.middleware.page_generation_time.PageGenerationTimeMiddleware',
+    'myshows.middleware.page_generation_time.RangesMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'

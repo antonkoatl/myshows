@@ -1,0 +1,13 @@
+djangorestframework~=3.12.2
+Django~=3.1.5
+celery~=5.0.5
+imageio~=2.9.0
+numpy~=1.18.0
+scikit-image~=0.17.2
+APScheduler~=3.7.0
+requests~=2.21.0
+dostoevsky~=0.6.0
+spacy~=3.0.3
+beautifulsoup4~=4.9.3
+pytz~=2020.1
+Pillow~=7.1.2

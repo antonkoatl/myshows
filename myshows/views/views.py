@@ -244,7 +244,9 @@ class NamedEntityView(generic.DetailView):
 
         shows = {}
 
-        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(content_type=ContentType.objects.get_for_model(Fact)):
+        page_occurrences = NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).prefetch_related('content_object')
+
+        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Fact)):
             fact = occurrence.content_object
             if fact.show.id not in shows:
                 shows[fact.show.id] = fact.show
@@ -252,8 +254,7 @@ class NamedEntityView(generic.DetailView):
             else:
                 shows[fact.show.id].display_data.append(occurrence.occurrence_context)
 
-        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(
-                content_type=ContentType.objects.get_for_model(Review)):
+        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Review)):
             review = occurrence.content_object
             if review.show.id not in shows:
                 shows[review.show.id] = review.show
@@ -261,8 +262,7 @@ class NamedEntityView(generic.DetailView):
             else:
                 shows[review.show.id].display_data.append(occurrence.occurrence_context)
 
-        for occurrence in NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).filter(
-                content_type=ContentType.objects.get_for_model(Show)):
+        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Show)):
             show = occurrence.content_object
             if show.id not in shows:
                 shows[show.id] = show
@@ -271,8 +271,6 @@ class NamedEntityView(generic.DetailView):
                 shows[show.id].display_data.append(occurrence.occurrence_context)
 
         context['shows'] = shows.values()
-
-
 
         return context
 

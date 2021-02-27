@@ -11,7 +11,6 @@ def clear_db_entities(content_object):
     NamedEntityOccurrence.objects.filter(
         content_type=ContentType.objects.get_for_model(content_object),
         object_id=content_object.id).delete()
-    NamedEntity.objects.filter(namedentityoccurrence=None).delete()
 
 
 @app.task

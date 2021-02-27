@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 {% load static %}
 <script src="{% static 'js/jquery-3.5.1.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/css/bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.css' %}" />
 <link rel="stylesheet" href="{% static 'tiny-slider/tiny-slider.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'custom.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'custom.v1.css' %}" />
 <html lang="en" class="h-100">
 <head>
   {% block title %}<title>Local Library</title>{% endblock %}
 </head>
 
 <body class="d-flex flex-column h-100">
-    <script src="{% static "bootstrap/js/bootstrap.bundle.min.js" %}"></script>
+    <script src="{% static "bootstrap/dist/js/bootstrap.bundle.min.js" %}"></script>
     <script src="{% static 'tiny-slider/tiny-slider.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha384-GNFwBvfVxBkLMJpYMOABq3c+d3KnQxudP/mGPkzpZSTYykLBNsZEnG2D9G/X/+7D" crossorigin="anonymous" async></script>
     {% include "header.html" %}

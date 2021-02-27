@@ -85,20 +85,6 @@ def parse_ner_text(text, content_object):
     return description_marked
 
 
-def get_url_for_named_entity_content(occurrence):
-    url = ''
-    if occurrence.content_type == ContentType.objects.get_for_model(Show):
-        url = reverse("detail", args=[occurrence.object_id])
-    elif occurrence.content_type == ContentType.objects.get_for_model(Fact):
-        url = reverse("detail", args=[occurrence.content_object.show.id])
-    elif occurrence.content_type == ContentType.objects.get_for_model(Review):
-        url = reverse("detail", args=[occurrence.content_object.show.id]) + f"?review={occurrence.object_id}"
-    elif occurrence.content_type == ContentType.objects.get_for_model(Article):
-        url = reverse("news_detail", args=[occurrence.object_id])
-
-    return url + f'#occurrence-{occurrence.id}'
-
-
 def process_founded_entity(entity, content_object, text):
     entity_db = NamedEntity.objects.filter(lemma__lemma=get_lemma(entity)).first()
 
@@ -117,27 +103,30 @@ def process_founded_entity(entity, content_object, text):
         occurrence_db = NamedEntityOccurrence(
             named_entity=entity_db,
             content_object=content_object,
-            occurrence_context='',
         )
         occurrence_db.save()
 
-        text_context = f'<a href="{get_url_for_named_entity_content(occurrence_db)}" class="badge bg-danger">' + entity.text + '</a>'
-        left_space_half = math.floor(
-            (NamedEntityOccurrence._meta.get_field('occurrence_context').max_length - len(text_context)) / 2)
-        text_context = text[entity.start_char - left_space_half:entity.start_char] + text_context + text[
-                                                                                                    entity.end_char:entity.end_char + left_space_half]
+        # text_context = f'<a href="{get_url_for_named_entity_content(occurrence_db)}" class="badge bg-danger">' + entity.text + '</a>'
 
-        i = entity.start_char - left_space_half - 1
+        left_width = NamedEntityOccurrence._meta.get_field('window_left').max_length
+        right_width = NamedEntityOccurrence._meta.get_field('window_right').max_length
+
+        window_left = text[max(entity.start_char - left_width, 0):entity.start_char]
+        window_right = text[entity.end_char:entity.end_char + right_width]
+
+        i = entity.start_char - left_width - 1
         while 0 <= i < entity.start_char and not text[i].isspace():
             i += 1
-        text_context = text_context[i - (entity.start_char - left_space_half - 1):]
+        window_left = window_left[i - (entity.start_char - left_width - 1):]
 
-        i = entity.end_char + left_space_half
+        i = entity.end_char + right_width
         while len(text) > i > entity.end_char and not text[i].isspace():
             i -= 1
-        text_context = text_context[:-(entity.end_char + left_space_half - i) or None]
+        window_right = window_right[:-(entity.end_char + right_width - i) or None]
 
-        occurrence_db.occurrence_context = text_context
+        occurrence_db.window_left = window_left
+        occurrence_db.window_right = window_right
+        occurrence_db.window_text = entity.text
         occurrence_db.save()
 
     return entity_db, occurrence_db
@@ -162,7 +151,7 @@ def parse_ner_soup(text_node, content_object, soup):
 
         text_node.insert_before(text[current_pos:entity.start_char])
         a_tag = soup.new_tag("a", attrs={
-            "class": "badge bg-info",
+            "class": "btn badge bg-occurrence",
             "href": reverse("named_entity", args=[entity_db.id]),
             "id": f"occurrence-{occurrence_db.id}"
         })

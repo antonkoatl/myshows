@@ -250,25 +250,25 @@ class NamedEntityView(generic.DetailView):
             fact = occurrence.content_object
             if fact.show.id not in shows:
                 shows[fact.show.id] = fact.show
-                shows[fact.show.id].display_data = [occurrence.occurrence_context]
+                shows[fact.show.id].display_data = [occurrence]
             else:
-                shows[fact.show.id].display_data.append(occurrence.occurrence_context)
+                shows[fact.show.id].display_data.append(occurrence)
 
         for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Review)):
             review = occurrence.content_object
             if review.show.id not in shows:
                 shows[review.show.id] = review.show
-                shows[review.show.id].display_data = [occurrence.occurrence_context]
+                shows[review.show.id].display_data = [occurrence]
             else:
-                shows[review.show.id].display_data.append(occurrence.occurrence_context)
+                shows[review.show.id].display_data.append(occurrence)
 
         for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Show)):
             show = occurrence.content_object
             if show.id not in shows:
                 shows[show.id] = show
-                shows[show.id].display_data = [occurrence.occurrence_context]
+                shows[show.id].display_data = [occurrence]
             else:
-                shows[show.id].display_data.append(occurrence.occurrence_context)
+                shows[show.id].display_data.append(occurrence)
 
         context['shows'] = shows.values()
 

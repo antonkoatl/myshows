@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load app_tags %}
 
 {% block content %}
     <div class="container">
@@ -12,24 +13,18 @@
         <div class="row">
             {% for show in shows %}
                 <div class="col-lg-6 p-1">
-                    <div class="card" >
-                        <div class="row row-cols-2">
-                            <div class="col">
+                    <div class="clearfix border rounded p-2" >
+                        <div class="float-md-start mb-3 me-3">
                                 <a href="{% url 'detail' show.id %}">
-                                    <img class="card-img-top" src="{{ show.get_poster }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+                                    <img class="" src="{{ show.get_poster }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
                                 </a>
-                                <div class="card-body">
-                                    <h6 class="card-title">{{ show.get_title_ru }}</h6>
+                                <div class="p-2 text-center" style="max-width: 12rem;">
+                                    <span class="fw-bold">{{ show.get_title_ru }}</span>
                                 </div>
-                            </div>
-                            <div class="col">
-                                <div class="card-body">
-                                    {% for data in show.display_data %}
-                                        <p class="fs-6">...{{ data|safe }}...</p>
-                                    {% endfor %}
-                                </div>
-                            </div>
                         </div>
+                        {% for data in show.display_data %}
+                            <p class="fs-6">...{{ data.window_left|safe }}<a class="btn badge bg-occurrence" href="{% get_url_for_named_entity_content data %}">{{ data.window_text }}</a>{{ data.window_right|safe }}...</p>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}
@@ -37,7 +32,7 @@
                 {% if occurence.content_type.model == "article" %}
                     <div class="col-lg-6 p-1">
                         <div class="card">
-                            <div class="row row-cols-2">
+                            <div class="row row-cols-2 bg-info">
                                 <div class="col" style="max-width: 12rem;">
                                     <a href="{% url 'news_detail' occurence.object_id %}">
                                         <img class="card-img-top" src="{{ occurence.content_object.articleimage_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
@@ -47,7 +42,7 @@
                                     </div>
                                 </div>
                                 <div class="col">
-                                    <p>...{{ occurence.occurrence_context|safe }}...</p>
+                                    <p>...{{ occurence.window_left|safe }}{{ occurence.name_entity }}{{ occurence.window_right|safe }}...</p>
                                 </div>
                             </div>
                         </div>

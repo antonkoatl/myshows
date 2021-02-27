@@ -3,7 +3,7 @@ import re
 import celery
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
@@ -93,14 +93,17 @@ class Show(models.Model):
 
 
 @receiver(pre_save, sender=Show)
-def update_description_markup(sender, instance: Show, **kwargs):
-    if instance.id is None:  # new object will be created
-        celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
-    else:
+def update_description_markup_pre(sender, instance: Show, **kwargs):
+    if instance.id is not None:
         previous = sender.objects.get(id=instance.id)
         if previous.description != instance.description:  # field will be updated
             instance.description_marked = None
-            celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
+
+
+@receiver(post_save, sender=Show)
+def update_content_markup_post(sender, instance: Show, **kwargs):
+    if instance.description_marked is None:
+        celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
 
 
 class Poster(models.Model):
@@ -121,14 +124,17 @@ class Fact(models.Model):
 
 
 @receiver(pre_save, sender=Fact)
-def update_content_markup_fact(sender, instance: Fact, **kwargs):
-    if instance.id is None:  # new object will be created
-        celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
-    else:
+def update_content_markup_fact_pre(sender, instance: Fact, **kwargs):
+    if instance.id is not None:
         previous = sender.objects.get(id=instance.id)
         if previous.string != instance.string:  # field will be updated
             instance.string_marked = None
-            celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
+
+
+@receiver(post_save, sender=Fact)
+def update_content_markup_fact_post(sender, instance: Fact, **kwargs):
+    if instance.string_marked is None:
+        celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
 
 
 class Review(models.Model):
@@ -151,14 +157,17 @@ class Review(models.Model):
 
 
 @receiver(pre_save, sender=Review)
-def update_content_markup_review(sender, instance: Review, **kwargs):
-    if instance.id is None:  # new object will be created
-        celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
-    else:
+def update_content_markup_review_pre(sender, instance: Review, **kwargs):
+    if instance.id is not None:
         previous = sender.objects.get(id=instance.id)
         if previous.description != instance.description:  # field will be updated
             instance.description_marked = None
-            celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
+
+
+@receiver(post_save, sender=Review)
+def update_content_markup_review_post(sender, instance: Review, **kwargs):
+    if instance.description_marked is None:
+        celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
 
 
 class ShowVideo(models.Model):

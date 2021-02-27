@@ -3,7 +3,7 @@ import re
 import celery
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
@@ -40,14 +40,17 @@ class Article(models.Model):
 
 
 @receiver(pre_save, sender=Article)
-def update_content_markup(sender, instance: Article, **kwargs):
-    if instance.id is None:  # new object will be created
-        celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
-    else:
+def update_content_markup_pre(sender, instance: Article, **kwargs):
+    if instance.id is not None:
         previous = sender.objects.get(id=instance.id)
         if previous.content != instance.content:  # field will be updated
             instance.content_marked = None
-            celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
+
+
+@receiver(post_save, sender=Article)
+def update_content_markup_post(sender, instance: Article, **kwargs):
+    if instance.content_marked is None:
+        celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
 
 
 class ArticleImage(models.Model):

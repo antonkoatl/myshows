@@ -1,3 +1,5 @@
+from itertools import zip_longest, chain
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
@@ -230,6 +232,13 @@ class TriviaView(generic.TemplateView):
 class NamedEntityView(generic.DetailView):
     model = NamedEntity
 
+    def append_data(self, data, item, occurrence):
+        if item.id not in data:
+            data[item.id] = item
+            data[item.id].display_data = [occurrence]
+        else:
+            data[item.id].display_data.append(occurrence)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -243,34 +252,21 @@ class NamedEntityView(generic.DetailView):
         context['page_obj'] = page_obj
 
         shows = {}
+        articles = {}
 
         page_occurrences = NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).prefetch_related('content_object')
 
-        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Fact)):
-            fact = occurrence.content_object
-            if fact.show.id not in shows:
-                shows[fact.show.id] = fact.show
-                shows[fact.show.id].display_data = [occurrence]
-            else:
-                shows[fact.show.id].display_data.append(occurrence)
+        for occurrence in page_occurrences:
+            if occurrence.content_type == ContentType.objects.get_for_model(Fact):
+                self.append_data(shows, occurrence.content_object.show, occurrence)
+            elif occurrence.content_type == ContentType.objects.get_for_model(Review):
+                self.append_data(shows, occurrence.content_object.show, occurrence)
+            elif occurrence.content_type == ContentType.objects.get_for_model(Show):
+                self.append_data(shows, occurrence.content_object, occurrence)
+            elif occurrence.content_type == ContentType.objects.get_for_model(Article):
+                self.append_data(articles, occurrence.content_object, occurrence)
 
-        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Review)):
-            review = occurrence.content_object
-            if review.show.id not in shows:
-                shows[review.show.id] = review.show
-                shows[review.show.id].display_data = [occurrence]
-            else:
-                shows[review.show.id].display_data.append(occurrence)
-
-        for occurrence in page_occurrences.filter(content_type=ContentType.objects.get_for_model(Show)):
-            show = occurrence.content_object
-            if show.id not in shows:
-                shows[show.id] = show
-                shows[show.id].display_data = [occurrence]
-            else:
-                shows[show.id].display_data.append(occurrence)
-
-        context['shows'] = shows.values()
+        context['items'] = filter(lambda x: x is not None, chain(*zip_longest(shows.values(), articles.values())))
 
         return context
 

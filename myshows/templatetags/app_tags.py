@@ -20,3 +20,8 @@ def get_url_for_named_entity_content(occurrence):
         url = reverse("news_detail", args=[occurrence.object_id])
 
     return url + f'#occurrence-{occurrence.id}'
+
+
+@register.simple_tag
+def get_model_name(item):
+    return item._meta.model_name

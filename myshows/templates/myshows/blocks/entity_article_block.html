@@ -2,17 +2,15 @@
 <div class="clearfix border rounded p-2" >
     <div class="float-md-start mb-3 me-3">
         <div style="width: 12rem; height: 7rem;">
-            <a href="{% url 'news_detail' occurence.object_id %}">
-                <img src="{{ occurence.content_object.articleimage_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+            <a href="{% url 'news_detail' article.id %}">
+                <img src="{{ article.articleimage_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
             </a>
         </div>
         <div class="p-2 text-center" style="max-width: 12rem;">
-            <span class="fw-bold">{{ occurence.content_object.title }}</span>
+            <span class="fw-bold">{{ article.title }}</span>
         </div>
     </div>
-    <p class="fs-6">
-        ...{{ occurence.window_left|safe }}
-        <a class="btn badge bg-occurrence" href="{% get_url_for_named_entity_content occurence %}">{{ occurence.window_text }}</a>
-        {{ occurence.window_right|safe }}...
-    </p>
+    {% for data in article.display_data %}
+        <p class="fs-6">...{{ data.window_left|safe }}<a class="btn badge bg-occurrence" href="{% get_url_for_named_entity_content data %}">{{ data.window_text }}</a>{{ data.window_right|safe }}...</p>
+    {% endfor %}
 </div>

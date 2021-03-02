@@ -11,17 +11,15 @@
             </div>
         </div>
         <div class="row" data-masonry='{"percentPosition": true }'>
-            {% for show in shows %}
+            {% for item in items %}
                 <div class="col-lg-6 p-1">
-                    {% include "myshows/blocks/entity_show_block.html" %}
+                    {% get_model_name item as model_name %}
+                    {% if model_name == 'show' %}
+                        {% include "myshows/blocks/entity_show_block.html" with show=item %}
+                    {% elif model_name == 'article' %}
+                        {% include "myshows/blocks/entity_article_block.html" with article=item %}
+                    {% endif %}
                 </div>
-            {% endfor %}
-            {% for occurence in page_obj.object_list %}
-                {% if occurence.content_type.model == "article" %}
-                    <div class="col-lg-6 p-1">
-                        {% include "myshows/blocks/entity_article_block.html" %}
-                    </div>
-                {% endif %}
             {% endfor %}
         </div>
         <div class="pagination">

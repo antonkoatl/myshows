@@ -25,6 +25,8 @@ urlpatterns = [
     path('trivia/check', views.check_trivia, name='check_trivia'),
     # ex: /myshows/entity/5/
     path('entity/<int:pk>/', views.NamedEntityView.as_view(), name='named_entity'),
+    # ex: /myshows/person/5/
+    path('person/<int:pk>/', views.PersonDetailView.as_view(), name='person_detail'),
 
     # ex: /myshows/test
     path('test/', views.TestView.as_view(), name='test'),

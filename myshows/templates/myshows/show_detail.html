@@ -116,18 +116,20 @@
                 {% for role in actor_roles %}
                     <div class="list-group-item list-group-item-action p-1" aria-current="true">
                         <div class="d-flex justify-content-center">
-                            {% if role.person.animated_poster %}
-                            <video width="120" autoplay muted loop playsinline muted>
-                                <source src="{{ role.person.animated_poster.url }}" type="video/mp4">
-                                Your browser does not support HTML video.
-                            </video>
-                            {% else %}
-                                {% if role.person.personimage_set.count > 0 %}
-                                    <img src="{{ role.person.personimage_set.first.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                            <a href="{% url 'person_detail' role.person.id %}">
+                                {% if role.person.animated_poster %}
+                                    <video width="120" autoplay muted loop playsinline muted>
+                                        <source src="{{ role.person.animated_poster.url }}" type="video/mp4">
+                                        Your browser does not support HTML video.
+                                    </video>
                                 {% else %}
-                                    <img src="/media/empty.jpg" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                                    {% if role.person.personimage_set.count > 0 %}
+                                        <img src="{{ role.person.personimage_set.first.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                                    {% else %}
+                                        <img src="/media/empty.jpg" class="d-block img-fluid mx-auto " alt="..." style="width: 150px;">
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
+                            </a>
                         </div>
                         <div>{{ role.person.get_name }} : {{ role.description }}</div>
                     </div>

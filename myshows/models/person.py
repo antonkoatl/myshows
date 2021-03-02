@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q, OuterRef
 from django.utils.translation import gettext_lazy as _
 
 
@@ -23,6 +24,17 @@ class Person(models.Model):
             return self.name_ru
         else:
             return self.name
+
+    def get_spouses(self):
+        return Person.objects.filter(
+            Q(id__in=self.person1_set.values_list('person2', flat=True)) |
+            Q(id__in=self.person2_set.values_list('person1', flat=True))
+        ).annotate(
+            divorced=PersonSpouse.objects.filter(
+                Q(person1=self, person2=OuterRef('id')) | Q(person2=self, person1=OuterRef('id'))
+            ).values_list('divorced', flat=True)
+        )
+
 
     def __str__(self):
         return f'{self.get_name()}'

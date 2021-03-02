@@ -10,7 +10,7 @@ from django.views import generic
 from myshows.models import Country, Genre, Tag
 from myshows.models.article import Article
 from myshows.models.named_entity import NamedEntity, NamedEntityOccurrence
-from myshows.models.person import PersonRole
+from myshows.models.person import PersonRole, Person
 from myshows.models.show import Poster, Show, Fact, Review
 from myshows.utils.trivia_helper import get_new_question
 
@@ -72,6 +72,15 @@ class IndexView(generic.TemplateView):
 
         context['shows'] = shows
         context['news'] = Paginator(news, 5).page(page)
+
+        context['top_places'] = NamedEntity.objects.filter(type=NamedEntity.Type.LOCATION).annotate(
+            refs_count=Count('namedentityoccurrence')).order_by('-refs_count')[:10]
+        context['top_persons'] = NamedEntity.objects.filter(type=NamedEntity.Type.PERSON).annotate(
+            refs_count=Count('namedentityoccurrence')).order_by('-refs_count')[:10]
+        context['top_organizations'] = NamedEntity.objects.filter(type=NamedEntity.Type.ORGANIZATION).annotate(
+            refs_count=Count('namedentityoccurrence')).order_by('-refs_count')[:10]
+        context['top_misc'] = NamedEntity.objects.filter(type=NamedEntity.Type.MISC).annotate(
+            refs_count=Count('namedentityoccurrence')).order_by('-refs_count')[:10]
         return context
 
 
@@ -278,3 +287,14 @@ class TestView(generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['actor_roles'] = Show.objects.get(pk=1).personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]
         return context
+
+
+class PersonDetailView(generic.DetailView):
+    model = Person
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+    def get_object(self):
+        return self.model.objects.filter(pk=self.kwargs['pk']).prefetch_related('personimage_set').get()

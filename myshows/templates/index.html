@@ -1,7 +1,47 @@
 {% extends "base.html" %}
 
 {% block content %}
-{% include "myshows/article_list_block.html" with page_obj=news %}
+    <div class="row">
+        <div class="col-auto ps-1 pe-1">
+            <span class="fw-bold">Места:</span>
+        </div>
+        {% for entity in top_places %}
+            <div class="col-auto ps-1 pe-1">
+                <a class="badge bg-occurrence" href="{% url 'named_entity' entity.id %}">{{ entity.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-auto ps-1 pe-1">
+            <span class="fw-bold">Персонажи:</span>
+        </div>
+        {% for entity in top_persons %}
+            <div class="col-auto ps-1 pe-1">
+                <a class="badge bg-occurrence" href="{% url 'named_entity' entity.id %}">{{ entity.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-auto ps-1 pe-1">
+            <span class="fw-bold">Организации:</span>
+        </div>
+        {% for entity in top_organizations %}
+            <div class="col-auto ps-1 pe-1">
+                <a class="badge bg-occurrence" href="{% url 'named_entity' entity.id %}">{{ entity.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-auto ps-1 pe-1">
+            <span class="fw-bold">Разное:</span>
+        </div>
+        {% for entity in top_misc %}
+            <div class="col-auto ps-1 pe-1">
+                <a class="badge bg-occurrence" href="{% url 'named_entity' entity.id %}">{{ entity.name }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">{% include "myshows/article_list_block.html" with page_obj=news %}</div>
 {% endblock %}
 
 {% block sidebar %}

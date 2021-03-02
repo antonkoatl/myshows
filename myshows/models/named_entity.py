@@ -33,15 +33,14 @@ class Lemma(models.Model):
 
 class NamedEntityOccurrence(models.Model):
     class Meta:
-        ordering = ['-id']
+        ordering = ['-position_start']
 
     named_entity = models.ForeignKey(NamedEntity, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    window_left = models.CharField(max_length=100, null=True, blank=True)
-    window_right = models.CharField(max_length=100, null=True, blank=True)
-    window_text = models.CharField(max_length=100)
+    position_start = models.PositiveIntegerField()
+    position_end = models.PositiveIntegerField()
 
     def __str__(self):
         return f'{self.named_entity} {self.content_object}'

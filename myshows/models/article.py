@@ -21,7 +21,6 @@ class Article(models.Model):
     title = models.CharField(max_length=1000)
     foreword = models.CharField(max_length=1000)
     content = models.TextField()
-    content_marked = models.TextField(null=True, blank=True)
     published_at = models.DateTimeField()
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     video = models.CharField(max_length=5000, null=True, blank=True)
@@ -41,15 +40,18 @@ class Article(models.Model):
 
 @receiver(pre_save, sender=Article)
 def update_content_markup_pre(sender, instance: Article, **kwargs):
-    if instance.id is not None:
+    instance.update_description = False
+    if instance.id is None:
+        instance.update_description = True
+    else:
         previous = sender.objects.get(id=instance.id)
         if previous.content != instance.content:  # field will be updated
-            instance.content_marked = None
+            instance.update_description = True
 
 
 @receiver(post_save, sender=Article)
 def update_content_markup_post(sender, instance: Article, **kwargs):
-    if instance.content_marked is None:
+    if instance.update_description is None:
         celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
 
 

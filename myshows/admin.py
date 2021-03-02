@@ -84,6 +84,7 @@ class NamedEntityOccurrenceInline(admin.TabularInline):
 @admin.register(NamedEntity)
 class NamedEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')
+    list_filter = ('type',)
     search_fields = ['name']
 
     inlines = [

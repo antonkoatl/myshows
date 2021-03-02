@@ -72,9 +72,9 @@
                     </a>
                     <div class="my-slider" style="">
                         {% for episode in season.episode_set.all %}
-                            {% if episode.episodeimage_set.exists %}
+                            {% if episode.episodeimage_set.count > 0 %}
                                 <div>
-                                    <img class="tns-lazy-img" data-src="{{ episode.episodeimage_set.first.image.url }}" class="" alt="..." style="max-width: 100%;">
+                                    <img class="tns-lazy-img" data-src="{{ episode.episodeimage_set.all.0.image.url }}" class="" alt="..." style="max-width: 100%;">
                                 </div>
                             {%  endif %}
                         {% endfor %}
@@ -102,11 +102,7 @@
         <div class="row">
             <div>
                 <p>
-                    {% if object.description_marked and "raw" not in request.GET %}
-                        {{ object.description_marked|safe }}
-                    {% else %}
-                        {{ object.description|safe }}
-                    {% endif %}
+                    {{ object.description|safe }}
                 </p>
             </div>
         </div>
@@ -137,16 +133,19 @@
             </div>
         </div>
         <div class="row">
+            <ul class="list-group">
+                {% for fact in facts %}
+                    <li class="list-group-item">{{ fact.string|safe }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="row">
             {% for review in reviews %}
                 <div class="row p-3" id="review-{{ review.id }}">
                     <h5>{{ review.title }}</h5>
                     <p>{{ review.date }}</p>
                     <div>
-                        {% if review.description_marked %}
-                            {{ review.description_marked|safe }}
-                        {% else %}
-                            {{ review.description|safe }}
-                        {% endif %}
+                        {{ review.description|safe }}
                     </div>
                 </div>
             {% endfor %}

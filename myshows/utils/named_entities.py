@@ -1,14 +1,11 @@
-import math
 import re
+from html.parser import HTMLParser
 from itertools import chain
-from pprint import pprint
 
 import spacy
-from bs4 import BeautifulSoup, NavigableString
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
-from myshows.models import Show, Fact, Review, Article
 from myshows.models.named_entity import NamedEntity, NamedEntityOccurrence
 
 nlp_ru = spacy.load("ru_core_news_lg")
@@ -85,7 +82,7 @@ def parse_ner_text(text, content_object):
     return description_marked
 
 
-def process_founded_entity(entity, content_object, text):
+def process_founded_entity(entity, content_object, position):
     entity_db = NamedEntity.objects.filter(lemma__lemma=get_lemma(entity)).first()
 
     if not entity_db:
@@ -103,38 +100,15 @@ def process_founded_entity(entity, content_object, text):
         occurrence_db = NamedEntityOccurrence(
             named_entity=entity_db,
             content_object=content_object,
+            position_start=position + entity.start_char,
+            position_end=position + entity.end_char
         )
-        occurrence_db.save()
-
-        # text_context = f'<a href="{get_url_for_named_entity_content(occurrence_db)}" class="badge bg-danger">' + entity.text + '</a>'
-
-        left_width = NamedEntityOccurrence._meta.get_field('window_left').max_length
-        right_width = NamedEntityOccurrence._meta.get_field('window_right').max_length
-
-        window_left = text[max(entity.start_char - left_width, 0):entity.start_char]
-        window_right = text[entity.end_char:entity.end_char + right_width]
-
-        i = entity.start_char - left_width - 1
-        while 0 <= i < entity.start_char and not text[i].isspace():
-            i += 1
-        window_left = window_left[i - (entity.start_char - left_width - 1):]
-
-        i = entity.end_char + right_width
-        while len(text) > i > entity.end_char and not text[i].isspace():
-            i -= 1
-        window_right = window_right[:-(entity.end_char + right_width - i) or None]
-
-        occurrence_db.window_left = window_left
-        occurrence_db.window_right = window_right
-        occurrence_db.window_text = entity.text
         occurrence_db.save()
 
     return entity_db, occurrence_db
 
 
-def parse_ner_soup(text_node, content_object, soup):
-    current_pos = 0
-    text = str(text_node)
+def parse_ner_soup(text, position, content_object):
     doc_ru = nlp_ru(text)
     doc_en = nlp_en(text)
     doc_xx = nlp_xx(text)
@@ -147,21 +121,7 @@ def parse_ner_soup(text_node, content_object, soup):
     ents_all.sort(key=lambda x: x.start_char)
 
     for entity in ents_all:
-        entity_db, occurrence_db = process_founded_entity(entity, content_object, text)
-
-        text_node.insert_before(text[current_pos:entity.start_char])
-        a_tag = soup.new_tag("a", attrs={
-            "class": "btn badge bg-occurrence",
-            "href": reverse("named_entity", args=[entity_db.id]),
-            "id": f"occurrence-{occurrence_db.id}"
-        })
-        a_tag.string = entity.text
-        text_node.insert_before(a_tag)
-        current_pos = entity.end_char
-
-    if len(ents_all) > 0:
-        text_node.insert_before(text[current_pos:])
-        text_node.extract()
+        process_founded_entity(entity, content_object, position)
 
 
 def recursive_soup_process(node, content_object, soup):
@@ -173,10 +133,27 @@ def recursive_soup_process(node, content_object, soup):
             recursive_soup_process(element, content_object, soup)
 
 
-def parse_html_text(html_text, content_object):
-    soup = BeautifulSoup(html_text, 'html.parser')
-    recursive_soup_process(soup, content_object, soup)
-    return str(soup)
+def parse_html_text(html_text, content_object, offset=0):
+    lines = html_text.split('\n')
+
+    class MyHTMLParser(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            pass
+
+        def handle_endtag(self, tag):
+            pass
+
+        def handle_data(self, data):
+            if self.lasttag == 'script':
+                return
+            pos = offset + self.getpos()[1]
+            for i in range(self.getpos()[0] - 1):
+                pos += len(lines[i]) + 1
+
+            parse_ner_soup(data, pos, content_object)
+
+    parser = MyHTMLParser(convert_charrefs=False)
+    parser.feed(html_text)
 
 
 def mark_description(show):
@@ -193,3 +170,5 @@ def mark_description(show):
 
     show.description_marked = description_marked
     show.save()
+
+

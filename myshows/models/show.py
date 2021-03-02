@@ -2,6 +2,7 @@ import re
 
 import celery
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -43,12 +44,11 @@ class Show(models.Model):
     seasons_total = models.IntegerField()
     year = models.IntegerField()
     description = models.TextField()
-    description_marked = models.TextField(null=True, blank=True)
     category = models.CharField(max_length=4, choices=ShowCategories.choices)
     type = models.CharField(max_length=4, choices=ShowTypes.choices)
     country = models.ManyToManyField(Country)
     started = models.DateTimeField()
-    ended = models.DateTimeField(null=True)
+    ended = models.DateTimeField(null=True, blank=True)
     runtime_one = models.DurationField()
     runtime_total = models.DurationField(null=True)
     genres = models.ManyToManyField(Genre, blank=True)
@@ -75,7 +75,7 @@ class Show(models.Model):
         return self.get_title_static(self.title_ru)
 
     def directors(self):
-        return self.personrole_set.filter(role=PersonRole.RoleType.DIRECTOR)
+        return self.personrole_set.filter(role=PersonRole.RoleType.DIRECTOR).select_related('person')
 
     def get_poster(self):
         poster = self.poster_set.first()
@@ -94,15 +94,18 @@ class Show(models.Model):
 
 @receiver(pre_save, sender=Show)
 def update_description_markup_pre(sender, instance: Show, **kwargs):
-    if instance.id is not None:
+    instance.update_description = False
+    if instance.id is None:
+        instance.update_description = True
+    else:
         previous = sender.objects.get(id=instance.id)
         if previous.description != instance.description:  # field will be updated
-            instance.description_marked = None
+            instance.update_description = True
 
 
 @receiver(post_save, sender=Show)
 def update_content_markup_post(sender, instance: Show, **kwargs):
-    if instance.description_marked is None:
+    if instance.update_description:
         celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
 
 
@@ -117,7 +120,7 @@ class Poster(models.Model):
 class Fact(models.Model):
     show = models.ForeignKey(Show, on_delete=models.CASCADE)
     string = models.CharField(max_length=3000)
-    string_marked = models.TextField(null=True, blank=True)
+    entity_occurrences = GenericRelation('NamedEntityOccurrence')
 
     def __str__(self):
         return f'{self.show}:{self.string[:20]}'
@@ -125,19 +128,24 @@ class Fact(models.Model):
 
 @receiver(pre_save, sender=Fact)
 def update_content_markup_fact_pre(sender, instance: Fact, **kwargs):
-    if instance.id is not None:
+    instance.update_description = False
+    if instance.id is None:
+        instance.update_description = True
+    else:
         previous = sender.objects.get(id=instance.id)
         if previous.string != instance.string:  # field will be updated
-            instance.string_marked = None
+            instance.update_description = True
 
 
 @receiver(post_save, sender=Fact)
 def update_content_markup_fact_post(sender, instance: Fact, **kwargs):
-    if instance.string_marked is None:
+    if instance.update_description is None:
         celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
 
 
 class Review(models.Model):
+    class Meta:
+        ordering = ['-date', ]
 
     class ReviewType(models.TextChoices):
         POSITIVE = "p", _("Позитивный")
@@ -150,7 +158,7 @@ class Review(models.Model):
     author = models.CharField(max_length=200)
     title = models.CharField(max_length=1000, null=True)
     description = models.TextField()
-    description_marked = models.TextField(null=True, blank=True)
+    entity_occurrences = GenericRelation('NamedEntityOccurrence')
 
     def __str__(self):
         return self.title + " " + str(self.show)
@@ -158,15 +166,18 @@ class Review(models.Model):
 
 @receiver(pre_save, sender=Review)
 def update_content_markup_review_pre(sender, instance: Review, **kwargs):
-    if instance.id is not None:
+    instance.update_description = False
+    if instance.id is None:
+        instance.update_description = True
+    else:
         previous = sender.objects.get(id=instance.id)
         if previous.description != instance.description:  # field will be updated
-            instance.description_marked = None
+            instance.update_description = True
 
 
 @receiver(post_save, sender=Review)
 def update_content_markup_review_post(sender, instance: Review, **kwargs):
-    if instance.description_marked is None:
+    if instance.update_description is None:
         celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
 
 

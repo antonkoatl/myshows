@@ -1,10 +1,13 @@
+import re
 from itertools import zip_longest, chain
+from random import sample
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.db.models import Count, Avg, F, Sum
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views import generic
 
 from myshows.models import Country, Genre, Tag
@@ -94,22 +97,70 @@ class ShowDetailView(generic.DetailView):
         if 'season_number' in self.kwargs:
             season = self.object.season_set.filter(number=self.kwargs['season_number']).first()
         else:
-            season = self.object.season_set.order_by('-number').first()
+            season = self.object.season_set.order_by('-number').prefetch_related(
+                'episode_set', 'episode_set__episodecomment_set', 'episode_set__episodeimage_set').first()
         context['season'] = season
 
-        context['actor_roles'] = self.object.personrole_set.filter(role=PersonRole.RoleType.ACTOR)[:5]
+        context['actor_roles'] = self.object.personrole_set.filter(role=PersonRole.RoleType.ACTOR).select_related('person')[:5]
 
         if 'review' in self.request.GET:
             review_id = self.request.GET['review']
-            context['reviews'] = Paginator(self.object.review_set.filter(id=review_id), 5).page(1)
+            context['reviews'] = Paginator(self.object.review_set.prefetch_related('entity_occurrences', 'entity_occurrences__named_entity').filter(id=review_id), 5).page(1)
         else:
             page = self.request.GET.get('page', 1)
-            context['reviews'] = Paginator(self.object.review_set.all(), 5).page(page)
+            context['reviews'] = Paginator(self.object.review_set.prefetch_related('entity_occurrences', 'entity_occurrences__named_entity'), 5).page(page)
 
+        description_marked = self.object.description
+
+        for occurrence in NamedEntityOccurrence.objects.filter(
+                content_type=ContentType.objects.get_for_model(Show),
+                object_id=self.object.id).order_by('-position_start').select_related('named_entity'):
+            description_marked = description_marked[:occurrence.position_start] + \
+                                 f'''<a class="btn badge bg-occurrence" href="{
+                                    reverse("named_entity", args=[occurrence.named_entity.id])
+                                 }" id="occurrence-{occurrence.id}">{
+                                    description_marked[occurrence.position_start:occurrence.position_end]
+                                 }</a>''' + description_marked[occurrence.position_end:]
+
+        description = ''
+        myshows_desc = re.search(r'\[Myshows](.+)\[\/Myshows]', description_marked, re.DOTALL)
+        if myshows_desc:
+            description += '<p>' + myshows_desc.group(1) + '</p>'
+
+        kinopoisk_desc = re.search(r'\[Kinopoisk](.+)\[\/Kinopoisk]', description_marked, re.DOTALL)
+        if kinopoisk_desc:
+            description += '<hr>'
+            description += '<p>' + kinopoisk_desc.group(1) + '</p>'
+
+        self.object.description = description
+
+        for review in context['reviews']:
+            for occurrence in review.entity_occurrences.all():
+                review.description = review.description[:occurrence.position_start] + \
+                                 f'''<a class="btn badge bg-occurrence" href="{
+                                    reverse("named_entity", args=[occurrence.named_entity.id])
+                                 }" id="occurrence-{occurrence.id}">{
+                                    review.description[occurrence.position_start:occurrence.position_end]
+                                 }</a>''' + review.description[occurrence.position_end:]
+
+        facts = sample(list(self.object.fact_set.all()), k=5) if self.object.fact_set.count() > 5 else self.object.fact_set.all()
+        if 'fact' in self.request.GET:
+            facts[0] = self.object.fact_set.get(pk=self.request.GET['fact'])
+
+        for fact in facts:
+            for occurrence in fact.entity_occurrences.all():
+                fact.string = fact.string[:occurrence.position_start] + \
+                                 f'''<a class="btn badge bg-occurrence" href="{
+                                    reverse("named_entity", args=[occurrence.named_entity.id])
+                                 }" id="occurrence-{occurrence.id}">{
+                                    fact.string[occurrence.position_start:occurrence.position_end]
+                                 }</a>''' + fact.string[occurrence.position_end:]
+
+        context['facts'] = facts
         return context
 
     def get_object(self):
-        return self.model.objects.filter(pk=self.kwargs['pk']).prefetch_related('genres', 'tags').get()
+        return self.model.objects.filter(pk=self.kwargs['pk']).prefetch_related('genres', 'tags', 'fact_set__entity_occurrences__named_entity').get()
 
 
 class ShowListView(generic.ListView):
@@ -177,6 +228,23 @@ class NewsListView(generic.ListView):
 class NewsDetailView(generic.DetailView):
     model = Article
 
+    def get_object(self, **kwargs):
+        object = super().get_object(**kwargs)
+        content = object.content
+
+        for occurrence in NamedEntityOccurrence.objects.filter(
+                content_type=ContentType.objects.get_for_model(Article),
+                object_id=object.id).order_by('-position_start'):
+            content = content[:occurrence.position_start] + \
+                                 f'''<a class="btn badge bg-occurrence" href="{
+                                 reverse("named_entity", args=[occurrence.named_entity.id])
+                                 }" id="occurrence-{occurrence.id}">{
+                                 content[occurrence.position_start:occurrence.position_end]
+                                 }</a>''' + content[occurrence.position_end:]
+
+        object.content = content
+        return object
+
 
 class RatingsDetailView(generic.TemplateView):
     template_name = "ratings.html"
@@ -241,7 +309,27 @@ class TriviaView(generic.TemplateView):
 class NamedEntityView(generic.DetailView):
     model = NamedEntity
 
-    def append_data(self, data, item, occurrence):
+    def append_occurrence(self, data, item, text, occurrence):
+        left_width = 100
+        right_width = 100
+
+        window_left = text[max(occurrence.position_start - left_width, 0):occurrence.position_start]
+        window_right = text[occurrence.position_end:occurrence.position_end + right_width]
+
+        i = occurrence.position_start - left_width - 1
+        while 0 <= i < occurrence.position_start and not text[i].isspace():
+            i += 1
+        window_left = window_left[i - (occurrence.position_start - left_width - 1):]
+
+        i = occurrence.position_end + right_width
+        while len(text) > i > occurrence.position_end and not text[i].isspace():
+            i -= 1
+        window_right = window_right[:-(occurrence.position_end + right_width - i) or None]
+
+        occurrence.window_left = re.sub(r'\[\/?(Kinopoisk|Myshows)]', '', window_left)
+        occurrence.window_right = re.sub(r'\[\/?(Kinopoisk|Myshows)]', '', window_right)
+        occurrence.window_text = text[occurrence.position_start:occurrence.position_end]
+
         if item.id not in data:
             data[item.id] = item
             data[item.id].display_data = [occurrence]
@@ -267,13 +355,13 @@ class NamedEntityView(generic.DetailView):
 
         for occurrence in page_occurrences:
             if occurrence.content_type == ContentType.objects.get_for_model(Fact):
-                self.append_data(shows, occurrence.content_object.show, occurrence)
+                self.append_occurrence(shows, occurrence.content_object.show, occurrence.content_object.string, occurrence)
             elif occurrence.content_type == ContentType.objects.get_for_model(Review):
-                self.append_data(shows, occurrence.content_object.show, occurrence)
+                self.append_occurrence(shows, occurrence.content_object.show, occurrence.content_object.description, occurrence)
             elif occurrence.content_type == ContentType.objects.get_for_model(Show):
-                self.append_data(shows, occurrence.content_object, occurrence)
+                self.append_occurrence(shows, occurrence.content_object, occurrence.content_object.description, occurrence)
             elif occurrence.content_type == ContentType.objects.get_for_model(Article):
-                self.append_data(articles, occurrence.content_object, occurrence)
+                self.append_occurrence(articles, occurrence.content_object, occurrence.content_object.content, occurrence)
 
         context['items'] = filter(lambda x: x is not None, chain(*zip_longest(shows.values(), articles.values())))
 

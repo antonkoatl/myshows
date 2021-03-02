@@ -13,7 +13,7 @@ def get_url_for_named_entity_content(occurrence):
     if occurrence.content_type == ContentType.objects.get_for_model(Show):
         url = reverse("detail", args=[occurrence.object_id])
     elif occurrence.content_type == ContentType.objects.get_for_model(Fact):
-        url = reverse("detail", args=[occurrence.content_object.show.id])
+        url = reverse("detail", args=[occurrence.content_object.show.id]) + f"?fact={occurrence.object_id}"
     elif occurrence.content_type == ContentType.objects.get_for_model(Review):
         url = reverse("detail", args=[occurrence.content_object.show.id]) + f"?review={occurrence.object_id}"
     elif occurrence.content_type == ContentType.objects.get_for_model(Article):

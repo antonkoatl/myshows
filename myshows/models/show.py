@@ -3,7 +3,7 @@ import re
 import celery
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.templatetags.static import static
@@ -108,7 +108,9 @@ def update_description_markup_pre(sender, instance: Show, **kwargs):
 @receiver(post_save, sender=Show)
 def update_content_markup_post(sender, instance: Show, **kwargs):
     if instance.update_description:
-        celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,))
+        transaction.on_commit(
+            lambda:
+            celery.current_app.send_task('myshows.tasks.process_show_description', (instance.id,)))
 
 
 class Poster(models.Model):
@@ -141,8 +143,9 @@ def update_content_markup_fact_pre(sender, instance: Fact, **kwargs):
 
 @receiver(post_save, sender=Fact)
 def update_content_markup_fact_post(sender, instance: Fact, **kwargs):
-    if instance.update_description is None:
-        celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,))
+    if instance.update_description:
+        transaction.on_commit(
+            lambda: celery.current_app.send_task('myshows.tasks.process_fact_description', (instance.id,)))
 
 
 class Review(models.Model):
@@ -179,8 +182,9 @@ def update_content_markup_review_pre(sender, instance: Review, **kwargs):
 
 @receiver(post_save, sender=Review)
 def update_content_markup_review_post(sender, instance: Review, **kwargs):
-    if instance.update_description is None:
-        celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,))
+    if instance.update_description:
+        transaction.on_commit(
+            lambda: celery.current_app.send_task('myshows.tasks.process_review_description', (instance.id,)))
 
 
 class ShowVideo(models.Model):

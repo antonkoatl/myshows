@@ -3,7 +3,7 @@ import re
 import celery
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -53,8 +53,10 @@ def update_content_markup_pre(sender, instance: Article, **kwargs):
 
 @receiver(post_save, sender=Article)
 def update_content_markup_post(sender, instance: Article, **kwargs):
-    if instance.update_description is None:
-        celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,))
+    if instance.update_description:
+        transaction.on_commit(
+            lambda: celery.current_app.send_task('myshows.tasks.process_article_description', (instance.id,)))
+
 
 
 class ArticleImage(models.Model):

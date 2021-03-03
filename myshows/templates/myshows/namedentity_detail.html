@@ -7,6 +7,14 @@
             <div class="col">
                 <h4>{{ object.name }}</h4>
                 <h5>{{ object.get_type_display }}</h5>
+                <div class="row">
+                    <div class="col-auto">Формы:</div>
+                    <div class="col-auto">
+                        {% for lemma in object.lemma_set.all %}
+                            {{ lemma.lemma }}
+                        {% endfor %}
+                    </div>
+                </div>
                 <hr>
             </div>
         </div>

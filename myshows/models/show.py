@@ -71,6 +71,8 @@ class Show(models.Model):
     imdb_rating = models.IntegerField(null=True)
     imdb_voted = models.IntegerField(null=True)
 
+    entity_occurrences = GenericRelation('NamedEntityOccurrence')
+
     def get_title_ru(self):
         return self.get_title_static(self.title_ru)
 

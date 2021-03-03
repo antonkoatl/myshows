@@ -18,11 +18,7 @@ class TriviaView(generic.TemplateView):
 
         context['mode'] = mode
         context['score'] = self.request.session['trivia']['score']
-        context['question'] = {
-            'type': question['type'],
-            'image': question['image_url'],
-            'variants': question['text_variants']
-        }
+        context['question'] = question
 
         self.request.session['trivia']['mode'] = mode
         self.request.session['trivia']['question'] = question

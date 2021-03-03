@@ -27,11 +27,7 @@ def check_trivia(request):
         new_question = get_new_question(mode)
         request.session['trivia']['question'] = new_question
 
-        result['question'] = {
-                'type':  new_question['type'],
-                'image': new_question['image_url'],
-                'variants': new_question['text_variants']
-            }
+        result['question'] = new_question
 
         request.session.modified = True
 
@@ -41,11 +37,7 @@ def check_trivia(request):
         new_question = get_new_question(mode)
         request.session['trivia']['question'] = new_question
 
-        result['question'] = {
-            'type': new_question['type'],
-            'image': new_question['image_url'],
-            'variants': new_question['text_variants']
-        }
+        result['question'] = new_question
 
         request.session.modified = True
 

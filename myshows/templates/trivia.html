@@ -4,23 +4,25 @@
     {% csrf_token %}
     <div id="question_img" class="col d-flex align-content-center flex-wrap" style="width: 700px; height: 400px">
         {% if question.type == 0 %}
-            <img src="{{ question.image }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
-        {% else %}
+            <img src="{{ question.image_url }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
+        {% elif question.type == 1 %}
             <div class="row">
-            {% for image_url in question.image %}
+            {% for image_url in question.image_url %}
                 <div class="col p-0">
-                <img src="{{ image_url }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
+                    <img src="{{ image_url }}" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">
                 </div>
             {% endfor %}
             </div>
+        {% elif question.type == 2 %}
+            {{ question.question_text|safe }}
         {% endif %}
     </div>
     <div class="row" style="width: 700px">
         <ul id="simpleList" class="list-group list-group-horizontal">
-            <li class="list-group-item list-group-item-action" id="answer0" value="0">{{ question.variants.0 }}</li>
-            <li class="list-group-item list-group-item-action" id="answer1" value="1">{{ question.variants.1 }}</li>
-            <li class="list-group-item list-group-item-action" id="answer2" value="2">{{ question.variants.2 }}</li>
-            <li class="list-group-item list-group-item-action" id="answer3" value="3">{{ question.variants.3 }}</li>
+            <li class="list-group-item list-group-item-action" id="answer0" value="0">{{ question.text_variants.0 }}</li>
+            <li class="list-group-item list-group-item-action" id="answer1" value="1">{{ question.text_variants.1 }}</li>
+            <li class="list-group-item list-group-item-action" id="answer2" value="2">{{ question.text_variants.2 }}</li>
+            <li class="list-group-item list-group-item-action" id="answer3" value="3">{{ question.text_variants.3 }}</li>
         </ul>
     </div>
     <script>
@@ -30,11 +32,11 @@
         function fillQuestion(question) {
             switch (question['type']) {
                 case 0:
-                    $('#question_img').html('<img src="' + question['image'] + '" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">');
+                    $('#question_img').html('<img src="' + question['image_url'] + '" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">');
                     break;
                 case 1:
                     var html_string = '<div class="row">';
-                    question['image'].forEach(function(item, i, arr) {
+                    question['image_url'].forEach(function(item, i, arr) {
                         html_string += '<div class="col p-0">\n' +
                             '<img src="' + item + '" class="img-fluid" alt="..." style="height: 100%; width: 100%; object-fit: contain">' +
                             '</div>';
@@ -42,19 +44,21 @@
                     html_string += '</div>';
                     $('#question_img').html(html_string);
                     break;
+                case 2:
+                    $('#question_img').html(question['question_text']);
                 default:
                     break;
             }
-            $('#answer0').text(question['variants'][0]);
+            $('#answer0').text(question['text_variants'][0]);
             $('#answer0').removeClass('list-group-item-success');
             $('#answer0').removeClass('list-group-item-danger');
-            $('#answer1').text(question['variants'][1]);
+            $('#answer1').text(question['text_variants'][1]);
             $('#answer1').removeClass('list-group-item-success');
             $('#answer1').removeClass('list-group-item-danger');
-            $('#answer2').text(question['variants'][2]);
+            $('#answer2').text(question['text_variants'][2]);
             $('#answer2').removeClass('list-group-item-success');
             $('#answer2').removeClass('list-group-item-danger');
-            $('#answer3').text(question['variants'][3]);
+            $('#answer3').text(question['text_variants'][3]);
             $('#answer3').removeClass('list-group-item-success');
             $('#answer3').removeClass('list-group-item-danger');
         }

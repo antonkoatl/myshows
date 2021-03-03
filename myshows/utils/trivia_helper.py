@@ -8,7 +8,35 @@ from myshows.models.episode import EpisodeImage
 from myshows.models.show import Show
 
 
-def get_new_question(mode):
+def get_new_question(mode='shows'):
+    """
+    Function to generate trivia question
+
+    Parameters
+    ----------
+    mode : str
+        Trivia mode. (shows, cartoon, anime, russia, america)
+
+    Returns
+    -------
+    question : dict
+        Generated question. Possible variants:
+            type = 0
+            image_url : str, url of image file
+            text_variants : list(str), list of text variants for question
+            correct_answer_num : int, index of correct answer
+
+            type = 1
+            image_url : list(str), list of urls of image files
+            text_variants : list(str), list of text variants for question
+            correct_answer_num : int, index of correct answer
+
+            type = 2
+            question_text : str, text of question
+            text_variants : list(str), list of text variants for question
+            correct_answer_num : int, index of correct answer
+    """
+
     shows = Show.objects.all()
 
     if mode == 'shows':
@@ -26,6 +54,7 @@ def get_new_question(mode):
     question = {'type': question_type}
 
     if question_type == 0:
+        # Get shows with episode images
         shows_with_images = list(shows.filter(season__episode__episodeimage__isnull=False).distinct().values_list('pk', 'title_ru'))
         question_shows = random.sample(shows_with_images, 4)
         correct = random.choice(question_shows)
@@ -36,10 +65,10 @@ def get_new_question(mode):
         question['correct_answer_num'] = question_shows.index(correct)
 
     elif question_type == 1:
-        shows_with_actors = list(shows.filter(personrole__role=PersonRole.RoleType.ACTOR,
-                                              personrole__person__personimage__isnull=False
-                                              ).annotate(actors_count=Count('personrole')
-                                                         ).values('actors_count', 'title_ru', 'pk').filter(actors_count__gte=5))
+        # Get show with at least 5 actors with image
+        shows_with_actors = list(shows.filter(
+            personrole__role=PersonRole.RoleType.ACTOR, personrole__person__personimage__isnull=False
+        ).annotate(actors_count=Count('personrole')).values('actors_count', 'title_ru', 'pk').filter(actors_count__gte=5))
 
         question_shows = random.sample(shows_with_actors, 4)
         correct = random.choice(question_shows)

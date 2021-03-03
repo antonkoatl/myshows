@@ -1,9 +1,11 @@
 {% load app_tags %}
+{% load static %}
+
 <div class="clearfix border rounded p-2" >
     <div class="float-md-start mb-3 me-3">
         <div style="width: 12rem; height: 7rem;">
             <a href="{% url 'news_detail' article.id %}">
-                <img src="{{ article.articleimage_set.first.image.url }}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
+                <img src="{% if article.articleimage_set.exists %}{{ article.articleimage_set.first.image.url }}{% else %}{% static 'placeholder-wide.jpg' %}{% endif %}" alt="..." style="max-width: 12rem;margin-left: auto;margin-right: auto;display: block;">
             </a>
         </div>
         <div class="p-2 text-center" style="max-width: 12rem;">

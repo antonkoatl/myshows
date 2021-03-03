@@ -77,10 +77,6 @@ class NamedEntityLemmaInline(admin.TabularInline):
     model = Lemma
 
 
-class NamedEntityOccurrenceInline(admin.TabularInline):
-    model = NamedEntityOccurrence
-
-
 @admin.register(NamedEntity)
 class NamedEntityAdmin(admin.ModelAdmin):
     list_display = ('name', 'type')
@@ -88,7 +84,7 @@ class NamedEntityAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
     inlines = [
-        NamedEntityLemmaInline, NamedEntityOccurrenceInline
+        NamedEntityLemmaInline
     ]
 
 

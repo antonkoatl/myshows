@@ -1,6 +1,6 @@
 from django.urls import path
 
-from myshows.views import views
+from myshows import views
 
 urlpatterns = [
     # ex: /myshows/

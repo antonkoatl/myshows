@@ -2,6 +2,7 @@ import re
 
 import celery
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -27,6 +28,7 @@ class Article(models.Model):
     category = models.CharField(max_length=20, choices=ArticleCategories.choices)
     tags = models.CharField(max_length=1000)
     source = models.CharField(max_length=1000)
+    entity_occurrences = GenericRelation('NamedEntityOccurrence')
 
     def get_embed_fit_video(self):
         html = self.video

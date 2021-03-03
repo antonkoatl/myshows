@@ -1,22 +1,16 @@
 import re
 
-from django.contrib.contenttypes.models import ContentType
-
-from mysite.celery import app
-from myshows.models import Show, Article, Fact, Review, NamedEntityOccurrence, NamedEntity
+from myshows.models import Show, Article, Fact, Review
 from myshows.utils.named_entities import parse_html_text
-
-
-def clear_db_entities(content_object):
-    NamedEntityOccurrence.objects.filter(
-        content_type=ContentType.objects.get_for_model(content_object),
-        object_id=content_object.id).delete()
+from mysite.celery import app
 
 
 @app.task
 def process_show_description(show_id):
+    """Task for processing Show object for Named Entities"""
+
     show = Show.objects.get(pk=show_id)
-    clear_db_entities(show)
+    show.entity_occurrences.all().delete()
 
     myshows_desc = re.search(r'\[Myshows](.+)\[\/Myshows]', show.description, re.DOTALL)
     if myshows_desc:
@@ -29,20 +23,23 @@ def process_show_description(show_id):
 
 @app.task
 def process_fact_description(fact_id):
+    """Task for processing Fact object for Named Entities"""
     fact = Fact.objects.get(pk=fact_id)
-    clear_db_entities(fact)
+    fact.entity_occurrences.all().delete()
     parse_html_text(fact.string, fact)
 
 
 @app.task
 def process_review_description(review_id):
+    """Task for processing Review object for Named Entities"""
     review = Review.objects.get(pk=review_id)
-    clear_db_entities(review)
+    review.entity_occurrences.all().delete()
     parse_html_text(review.description, review)
 
 
 @app.task
 def process_article_description(article_id):
+    """Task for processing Article object for Named Entities"""
     article = Article.objects.get(pk=article_id)
-    clear_db_entities(article)
+    article.entity_occurrences.all().delete()
     parse_html_text(article.content, article)

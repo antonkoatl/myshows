@@ -15,7 +15,7 @@
                 <div class="fs-4"><span class="badge bg-light text-dark">Дата рождения:</span> {{ object.birthday|date:"d.m.Y" }}</div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Место рождения:</span> {{ object.birthplace }}
                 <div class="fs-4"><span class="badge bg-light text-dark">Супруги:</span>
-                    {% for person in object.get_spouses %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'person_detail' person.id %}">{{ person.get_name }}</a> <span class="badge bg-secondary">{% if person.divorced %}в разводе{% endif %}</span>{% endfor %}</div>
+                    {% for person in object.get_spouses %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'person_detail' person.id %}">{{ person.get_name }}</a> <span class="badge bg-secondary fs-6">{% if person.divorced %}в разводе{% endif %}</span>{% endfor %}</div>
             </div>
         </div>
         <div class="row p-1">

@@ -6,7 +6,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.views import generic
 
-from myshows.models import NamedEntity, NamedEntityOccurrence, Fact, Review, Show, Article
+from myshows.models import NamedEntity, NamedEntityOccurrence, Fact, Review, Show, Article, PersonFact
 
 
 class NamedEntityView(generic.DetailView):
@@ -53,6 +53,7 @@ class NamedEntityView(generic.DetailView):
 
         shows = {}
         articles = {}
+        persons = {}
 
         page_occurrences = NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).prefetch_related('content_object')
 
@@ -65,7 +66,9 @@ class NamedEntityView(generic.DetailView):
                 self.append_occurrence(shows, occurrence.content_object, occurrence.content_object.description, occurrence)
             elif occurrence.content_type == ContentType.objects.get_for_model(Article):
                 self.append_occurrence(articles, occurrence.content_object, occurrence.content_object.content, occurrence)
+            elif occurrence.content_type == ContentType.objects.get_for_model(PersonFact):
+                self.append_occurrence(persons, occurrence.content_object.person, occurrence.content_object.string, occurrence)
 
-        context['items'] = filter(lambda x: x is not None, chain(*zip_longest(shows.values(), articles.values())))
+        context['items'] = filter(lambda x: x is not None, chain(*zip_longest(shows.values(), articles.values(), persons.values())))
 
         return context

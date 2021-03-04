@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import Q, OuterRef
+from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 
 
@@ -36,6 +37,11 @@ class Person(models.Model):
             ).values_list('divorced', flat=True)
         )
 
+    def get_poster(self):
+        if len(self.personimage_set.all()) > 0:
+            return self.personimage_set.all()[0].image.url  # Can't use first() here because it clears cached queryset for prefetch_related
+        else:
+            return static('poster_placeholder.jpg')
 
     def __str__(self):
         return f'{self.get_name()}'

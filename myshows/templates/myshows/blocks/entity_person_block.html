@@ -2,15 +2,15 @@
 <div class="clearfix border rounded p-2" >
     <div class="float-md-start mb-3 me-3">
         <div style="width: 12rem; height: 18rem;">
-            <a href="{% url 'detail' show.id %}">
-                <img src="{{ show.get_poster }}" alt="..." style="max-width: 12rem; max-height: 18rem; margin-left: auto;margin-right: auto;display: block;">
+            <a href="{% url 'person_detail' person.id %}">
+                <img src="{{ person.get_poster }}" alt="..." style="max-width: 12rem; max-height: 18rem; margin-left: auto;margin-right: auto;display: block;">
             </a>
         </div>
         <div class="p-2 text-center" style="max-width: 12rem;">
-            <span class="fw-bold">{{ show.get_title_ru }}</span>
+            <span class="fw-bold">{{ person.get_name }}</span>
         </div>
     </div>
-    {% for data in show.display_data %}
+    {% for data in person.display_data %}
         <p class="fs-6">...{{ data.window_left|safe }}<a class="btn badge bg-occurrence" href="{% get_url_for_named_entity_content data %}">{{ data.window_text }}</a>{{ data.window_right|safe }}...</p>
     {% endfor %}
 </div>

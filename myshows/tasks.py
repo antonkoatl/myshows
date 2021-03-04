@@ -1,6 +1,6 @@
 import re
 
-from myshows.models import Show, Article, Fact, Review
+from myshows.models import Show, Article, Fact, Review, PersonFact
 from myshows.utils.named_entities import parse_html_text
 from mysite.celery import app
 
@@ -43,3 +43,11 @@ def process_article_description(article_id):
     article = Article.objects.get(pk=article_id)
     article.entity_occurrences.all().delete()
     parse_html_text(article.content, article)
+
+
+@app.task
+def process_person_fact_description(fact_id):
+    """Task for processing PersonFact object for Named Entities"""
+    fact = PersonFact.objects.get(pk=fact_id)
+    fact.entity_occurrences.all().delete()
+    parse_html_text(fact.string, fact)

@@ -2,7 +2,7 @@ from django import template
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
-from myshows.models import Show, Fact, Review, Article
+from myshows.models import Show, Fact, Review, Article, PersonFact
 
 register = template.Library()
 
@@ -18,6 +18,8 @@ def get_url_for_named_entity_content(occurrence):
         url = reverse("detail", args=[occurrence.content_object.show.id]) + f"?review={occurrence.object_id}"
     elif occurrence.content_type == ContentType.objects.get_for_model(Article):
         url = reverse("news_detail", args=[occurrence.object_id])
+    elif occurrence.content_type == ContentType.objects.get_for_model(PersonFact):
+        url = reverse("person_detail", args=[occurrence.content_object.person.id]) + f"?fact={occurrence.object_id}"
 
     return url + f'#occurrence-{occurrence.id}'
 

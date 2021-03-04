@@ -26,6 +26,8 @@
                         {% include "myshows/blocks/entity_show_block.html" with show=item %}
                     {% elif model_name == 'article' %}
                         {% include "myshows/blocks/entity_article_block.html" with article=item %}
+                    {% elif model_name == 'person' %}
+                        {% include "myshows/blocks/entity_person_block.html" with person=item %}
                     {% endif %}
                 </div>
             {% endfor %}

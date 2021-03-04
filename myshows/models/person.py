@@ -1,6 +1,9 @@
+import celery
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q, OuterRef
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 from django.templatetags.static import static
 from django.utils.translation import gettext_lazy as _
 
@@ -59,6 +62,24 @@ class PersonFact(models.Model):
 
     def __str__(self):
         return f'{self.person}:{self.string[:20]}'
+
+
+@receiver(pre_save, sender=PersonFact)
+def update_content_markup_fact_pre(sender, instance: PersonFact, **kwargs):
+    instance.update_description = False
+    if instance.id is None:
+        instance.update_description = True
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.string != instance.string:  # field will be updated
+            instance.update_description = True
+
+
+@receiver(post_save, sender=PersonFact)
+def update_content_markup_fact_post(sender, instance: PersonFact, **kwargs):
+    if instance.update_description:
+        transaction.on_commit(
+            lambda: celery.current_app.send_task('myshows.tasks.process_person_fact_description', (instance.id,)))
 
 
 class PersonSpouse(models.Model):

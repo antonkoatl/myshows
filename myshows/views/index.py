@@ -11,7 +11,7 @@ class IndexView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         shows = Show.objects.order_by('-myshows_rating')[:10]
-        news = Article.objects.all()
+        news = Article.objects.prefetch_related('articleimage_set')
         page = self.request.GET.get('page', 1)
 
         context['shows'] = shows

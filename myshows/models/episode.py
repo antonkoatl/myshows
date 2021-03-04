@@ -26,10 +26,16 @@ class Episode(models.Model):
         else: return ""
 
     def get_comments_temperature(self):
-        if hasattr(self, 'temp_avg'):
-            return self.temp_avg
-        else:
-            temp_avg = self.episodecomment_set.aggregate(Avg('dost_positive'), Avg('dost_neutral'), Avg('dost_negative'))
+        if not hasattr(self, 'temp_avg'):
+            if hasattr(self, 'dost_positive__avg') and hasattr(self, 'dost_neutral__avg') and hasattr(self, 'dost_negative__avg'):
+                temp_avg = {
+                    'dost_positive__avg': self.dost_positive__avg,
+                    'dost_neutral__avg': self.dost_neutral__avg,
+                    'dost_negative__avg': self.dost_negative__avg
+                }
+            else:
+                temp_avg = self.episodecomment_set.aggregate(Avg('dost_positive'), Avg('dost_neutral'), Avg('dost_negative'))
+
             temp_sum = sum(filter(None, temp_avg.values()))
             for k in temp_avg:
                 if temp_avg[k] is not None:
@@ -37,7 +43,8 @@ class Episode(models.Model):
                 else:
                     temp_avg[k] = 0
             self.temp_avg = temp_avg
-            return temp_avg
+
+        return self.temp_avg
 
 
 class EpisodeImage(models.Model):

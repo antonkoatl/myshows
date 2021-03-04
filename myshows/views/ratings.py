@@ -1,4 +1,4 @@
-from django.db.models import F, Avg, Sum
+from django.db.models import F, Avg, Sum, Count
 from django.views import generic
 
 from myshows.models import Country, Genre, Tag

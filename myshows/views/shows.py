@@ -2,11 +2,11 @@ import re
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
-from django.db.models import Count
+from django.db.models import Count, Prefetch, Avg
 from django.urls import reverse
 from django.views import generic
 
-from myshows.models import Show, Poster, PersonRole, NamedEntityOccurrence, Genre, Tag, Country
+from myshows.models import Show, Poster, PersonRole, NamedEntityOccurrence, Genre, Tag, Country, Episode
 from myshows.utils.utils import sample_facts
 
 
@@ -18,11 +18,18 @@ class ShowDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['posters'] = Poster.objects.filter(show=self.object)
 
+        season_set = self.object.season_set.order_by('-number').prefetch_related(
+            Prefetch('episode_set', queryset=Episode.objects.annotate(
+                dost_positive__avg=Avg('episodecomment__dost_positive'),
+                dost_neutral__avg=Avg('episodecomment__dost_positive'),
+                dost_negative__avg=Avg('episodecomment__dost_negative')
+            ).prefetch_related('episodeimage_set'))
+        )
+
         if 'season_number' in self.kwargs:
-            season = self.object.season_set.filter(number=self.kwargs['season_number']).first()
+            season = season_set.filter(number=self.kwargs['season_number']).first()
         else:
-            season = self.object.season_set.order_by('-number').prefetch_related(
-                'episode_set', 'episode_set__episodecomment_set', 'episode_set__episodeimage_set').first()
+            season = season_set.first()
         context['season'] = season
 
         context['actor_roles'] = self.object.personrole_set.filter(role=PersonRole.RoleType.ACTOR).select_related('person')[:5]

@@ -6,7 +6,7 @@ from myshows.models import Article, NamedEntityOccurrence
 
 
 class NewsListView(generic.ListView):
-    model = Article
+    queryset = Article.objects.prefetch_related('articleimage_set')
     paginate_by = 20
 
     def get_context_data(self, **kwargs):

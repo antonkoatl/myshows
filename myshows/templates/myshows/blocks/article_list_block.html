@@ -2,7 +2,7 @@
 
 {% for article in page_obj %}
     <div class="row">
-        <div class="col" style="max-width:400px;"><img src="{% if article.articleimage_set.exists %}{{ article.articleimage_set.first.image.url }}{% else %}{% static 'placeholder-wide.jpg' %}{% endif %}" class="img-thumbnail" alt="..."></div>
+        <div class="col" style="max-width:400px;"><img src="{% if article.articleimage_set.exists %}{{ article.articleimage_set.all.0.image.url }}{% else %}{% static 'placeholder-wide.jpg' %}{% endif %}" class="img-thumbnail" alt="..."></div>
         <div class="col">
             <a class="fs-4 btn btn-light" href="{% url 'news_detail' article.id %}">{{ article.title }}</a>
             <div class="fs-4">{{ article.published_at }}</div>

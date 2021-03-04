@@ -10,5 +10,5 @@ class PersonDetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['facts'] = sample_facts(self.object.personfact_set.prefetch_related('entity_occurrences'), self.request.GET.get('fact', None))
+        context['facts'] = sample_facts(self.object.personfact_set.prefetch_related('entity_occurrences__named_entity'), self.request.GET.get('fact', None))
         return context

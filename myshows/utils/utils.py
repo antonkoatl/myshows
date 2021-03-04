@@ -6,7 +6,8 @@ from django.urls import reverse
 def sample_facts(fact_set, necessary_fact_id=None):
     """Function to get a list of 5 random facts, including necessary fact is provided"""
 
-    facts = sample(list(fact_set), k=5) if len(fact_set) > 5 else fact_set.all()
+    facts = list(fact_set)
+    if len(facts) > 5: facts = sample(facts, k=5)
 
     if necessary_fact_id:
         facts[0] = fact_set.get(id=necessary_fact_id)

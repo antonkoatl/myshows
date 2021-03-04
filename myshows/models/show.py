@@ -80,9 +80,8 @@ class Show(models.Model):
         return self.personrole_set.filter(role=PersonRole.RoleType.DIRECTOR).select_related('person')
 
     def get_poster(self):
-        poster = self.poster_set.first()
-        if poster:
-            return poster.image.url
+        if len(self.poster_set.all()) > 0:
+            return self.poster_set.all()[0].image.url  # Can't use first() here because it clears cached queryset for prefetch_related
         else:
             return static('poster_placeholder.jpg')
 

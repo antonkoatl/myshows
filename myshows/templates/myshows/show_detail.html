@@ -1,37 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
+
 
 {% block content %}
     <div class="container">
         <div class="row">
             <div class="col-md-auto">
-                <div class="row" style="width:300px;">
-                    {% if posters %}
-                        {% if posters|length > 1 %}
-                            <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="10000" style="background-color:#f8edeb">
-                                <div class="carousel-inner rounded">
-                                        {% for poster in posters %}
-                                            <div class="carousel-item{% if forloop.counter0 == 0%} active{% endif %}">
-                                                <img src="{{ poster.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
-                                            </div>
-                                        {% endfor %}
-                                </div>
-                                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </a>
-                                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </a>
-                            </div>
-                        {% else %}
-                            <img src="{{ posters.first.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
-                        {% endif %}
-                    {% else %}
-                        <img src="{% static 'poster_placeholder.jpg' %}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
-                    {% endif %}
-                </div>
+                {% include 'myshows/blocks/poster_carousel_block.html' %}
             </div>
             <div class="col">
                 <div class="row">
@@ -133,11 +107,7 @@
             </div>
         </div>
         <div class="row">
-            <ul class="list-group">
-                {% for fact in facts %}
-                    <li class="list-group-item">{{ fact.string|safe }}</li>
-                {% endfor %}
-            </ul>
+            {% include 'myshows/blocks/facts_list_block.html' %}
         </div>
         <div class="row">
             {% for review in reviews %}

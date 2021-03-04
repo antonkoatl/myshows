@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models import Q, OuterRef
 from django.utils.translation import gettext_lazy as _
@@ -48,6 +49,7 @@ class PersonImage(models.Model):
 class PersonFact(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     string = models.CharField(max_length=3000)
+    entity_occurrences = GenericRelation('NamedEntityOccurrence')
 
     def __str__(self):
         return f'{self.person}:{self.string[:20]}'

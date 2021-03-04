@@ -1,0 +1,6 @@
+<ul class="list-group">
+    <h5>Интересные факты</h5>
+    {% for fact in facts %}
+        <li class="list-group-item">{{ fact.string|safe }}</li>
+    {% endfor %}
+</ul>

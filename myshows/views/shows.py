@@ -1,5 +1,4 @@
 import re
-from random import sample
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
@@ -8,10 +7,12 @@ from django.urls import reverse
 from django.views import generic
 
 from myshows.models import Show, Poster, PersonRole, NamedEntityOccurrence, Genre, Tag, Country
+from myshows.utils.utils import sample_facts
 
 
 class ShowDetailView(generic.DetailView):
     model = Show
+    queryset = Show.objects.prefetch_related('genres', 'tags', 'fact_set__entity_occurrences__named_entity')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,24 +67,10 @@ class ShowDetailView(generic.DetailView):
                                     review.description[occurrence.position_start:occurrence.position_end]
                                  }</a>''' + review.description[occurrence.position_end:]
 
-        facts = sample(list(self.object.fact_set.all()), k=5) if self.object.fact_set.count() > 5 else self.object.fact_set.all()
-        if 'fact' in self.request.GET:
-            facts[0] = self.object.fact_set.get(pk=self.request.GET['fact'])
 
-        for fact in facts:
-            for occurrence in fact.entity_occurrences.all():
-                fact.string = fact.string[:occurrence.position_start] + \
-                                 f'''<a class="btn badge bg-occurrence" href="{
-                                    reverse("named_entity", args=[occurrence.named_entity.id])
-                                 }" id="occurrence-{occurrence.id}">{
-                                    fact.string[occurrence.position_start:occurrence.position_end]
-                                 }</a>''' + fact.string[occurrence.position_end:]
 
-        context['facts'] = facts
+        context['facts'] = sample_facts(self.object.fact_set.all(), self.request.GET.get('fact', None))
         return context
-
-    def get_object(self):
-        return self.model.objects.filter(pk=self.kwargs['pk']).prefetch_related('genres', 'tags', 'fact_set__entity_occurrences__named_entity').get()
 
 
 class ShowListView(generic.ListView):

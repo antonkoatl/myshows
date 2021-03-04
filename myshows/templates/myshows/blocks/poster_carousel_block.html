@@ -21,7 +21,7 @@
                 </a>
             </div>
         {% else %}
-            <img src="{{ posters.0.image.url }}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">
+            <img src="{{ posters.0.image.url }}" class="mx-auto" alt="..." style="max-height: 400px; width: auto;">
         {% endif %}
     {% else %}
         <img src="{% static 'poster_placeholder.jpg' %}" class="d-block img-fluid mx-auto " alt="..." style="max-height: 400px;">

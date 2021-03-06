@@ -46,17 +46,34 @@
 
 {% block sidebar %}
     <div class="">
-        <h4>Топ</h4>
-        {% for show in shows %}
-            <div class="p-1">
-                <div class="float-end">
-                    <span class="text-black-50 fs-9">смотрят {{ show.myshows_watching }}</span>
+        <div class="m-2 p-1 border">
+            <h4>Топ сериалов</h4>
+            {% for show in shows %}
+                <div class="p-1">
+                    <div class="float-end">
+                        <span class="text-black-50 fs-9">смотрят {{ show.myshows_watching }}</span>
+                    </div>
+                    <div>
+                        <a class="link-dark" href="{% url 'detail' show.id %}">{{ show.get_title_ru }}</a>
+                        <sup class="fs-9">{{ show.myshows_rating }}</sup>
+                    </div>
                 </div>
+            {% endfor %}
+        </div>
+        <div class="m-2 p-1 border">
+            <h4>Лучшие эпизоды</h4>
+            {% for episode in top_episodes %}
                 <div>
-                    <a class="link-dark" href="{% url 'detail' show.id %}">{{ show.title_ru }}</a>
-                    <sup class="fs-9">{{ show.myshows_rating }}</sup>
+                    <a class="link-dark" href="{% url 'detail' episode.season.show.id %}">{{ episode.season.show.get_title_ru }}</a>
+                    <div>S{{ episode.season.number }} : Ep{{ episode.number }} : {{ episode.get_title }}</div>
+                    Настроение комментариев ({{ episode.episodecomment_set.all|length }}):
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ episode.get_comments_temperature.dost_positive__avg|percentage }}%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ episode.get_comments_temperature.dost_neutral__avg|percentage }}%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ episode.get_comments_temperature.dost_negative__avg|percentage }}%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

@@ -21,7 +21,7 @@ class ShowDetailView(generic.DetailView):
         season_set = self.object.season_set.order_by('-number').prefetch_related(
             Prefetch('episode_set', queryset=Episode.objects.annotate(
                 dost_positive__avg=Avg('episodecomment__dost_positive'),
-                dost_neutral__avg=Avg('episodecomment__dost_positive'),
+                dost_neutral__avg=Avg('episodecomment__dost_neutral'),
                 dost_negative__avg=Avg('episodecomment__dost_negative')
             ).prefetch_related('episodeimage_set'))
         )

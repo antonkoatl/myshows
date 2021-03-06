@@ -185,7 +185,7 @@
         {% for episode_item in season.episode_set.all %}
             <div class="list-group-item list-group-item-action{% if season_item == season %} active{% endif %}" aria-current="true">
                 <div>{{ episode_item.number }} : {{ episode_item.get_title }}</div>
-                Настроение комментариев ({{ episode_item.episodecomment_set|length }}):
+                Настроение комментариев ({{ episode_item.episodecomment_set.all|length }}):
                 <div class="progress">
                     <div class="progress-bar bg-success" role="progressbar" style="width: {{ episode_item.get_comments_temperature.dost_positive__avg|percentage }}%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
                     <div class="progress-bar bg-info" role="progressbar" style="width: {{ episode_item.get_comments_temperature.dost_neutral__avg|percentage }}%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>

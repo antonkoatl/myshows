@@ -178,5 +178,16 @@ LOGGING = {
     },
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
+
 # Celery Configuration Options
 CELERY_WORKER_CONCURRENCY = 1
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

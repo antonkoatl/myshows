@@ -13,56 +13,72 @@
                     <h3>{{ object.name }}</h3>
                 </div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Дата рождения:</span> {{ object.birthday|date:"d.m.Y" }}</div>
-                <div class="fs-4"><span class="badge bg-light text-dark">Место рождения:</span> {{ object.birthplace }}
+                <div class="fs-4"><span class="badge bg-light text-dark">Место рождения:</span> {{ object.birthplace }}</div>
                 <div class="fs-4"><span class="badge bg-light text-dark">Супруги:</span>
                     {% for person in object.get_spouses %}{% if forloop.counter0 > 0%}, {% endif %}<a class="fs-6 link-dark" href="{% url 'person_detail' person.id %}">{{ person.get_name }}</a> <span class="badge bg-secondary fs-6">{% if person.divorced %}в разводе{% endif %}</span>{% endfor %}</div>
             </div>
         </div>
         <div class="row p-1">
             <div class="col">
-                <div class="carousel" id="customize-controls">
-                    <a class="carousel-control-prev" role="button" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" role="button" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Next</span>
-                    </a>
-                    <div class="my-slider" style="">
+                {% if object.personrole_set.all|length > 5 %}
+                    <div class="carousel" id="customize-controls">
+                        <a class="carousel-control-prev" role="button" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" role="button" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                        <div class="my-slider" style="">
+                            {% for role in object.personrole_set.all %}
+                                <div class="" style="">
+                                    <a href="{% url 'detail' role.show.id %}">
+                                            <img class="tns-lazy-img" data-src="{{ role.show.get_poster }}" class="" alt="..." style="max-width: 100%;">
+                                    </a>
+                                    <p>{{ role.get_role_display }}</p>
+                                    <p>{{ role.description }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row">
                         {% for role in object.personrole_set.all %}
-                            <div>
+                            <div class="col-md-auto" style="">
                                 <a href="{% url 'detail' role.show.id %}">
-                                    <img class="tns-lazy-img" data-src="{{ role.show.get_poster }}" class="" alt="..." style="max-width: 100%;">
+                                        <img src="{{ role.show.get_poster }}" class="" alt="..." style="max-width: 100%; max-height: 12rem">
                                 </a>
                                 <p>{{ role.get_role_display }}</p>
                                 <p>{{ role.description }}</p>
                             </div>
                         {% endfor %}
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
         <div class="row">
             {% include 'myshows/blocks/facts_list_block.html' %}
         </div>
     </div>
-    <script>
-        var slider = tns({
-            container: '.my-slider',
-            items: 2,
-            lazyload: true,
-            mouseDrag: true,
-            nav: false,
-            gutter: 10,
-            edgePadding: 20,
-            controlsContainer: "#customize-controls",
-            preventScrollOnTouch: 'force',
-            responsive: {
-                1024: {
-                    "items": 5
-                }
-            },
-        });
-    </script>
+    {% if object.personrole_set.all|length > 5 %}
+        <script>
+            var slider = tns({
+                container: '.my-slider',
+                items: 2,
+                lazyload: true,
+                mouseDrag: true,
+                nav: false,
+                gutter: 10,
+                edgePadding: 20,
+                controlsContainer: "#customize-controls",
+                preventScrollOnTouch: 'force',
+                responsive: {
+                    1024: {
+                        "items": 5
+                    }
+                },
+            });
+        </script>
+    {% endif %}
 {% endblock %}

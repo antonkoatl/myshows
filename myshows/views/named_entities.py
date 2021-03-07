@@ -6,7 +6,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.core.paginator import Paginator
 from django.views import generic
 
-from myshows.models import NamedEntity, NamedEntityOccurrence, Fact, Review, Show, Article, PersonFact
+from myshows.models import NamedEntity, Fact, Review, Show, Article, PersonFact
 
 
 class NamedEntityView(generic.DetailView):
@@ -47,28 +47,41 @@ class NamedEntityView(generic.DetailView):
 
         context['similary_entities'] = similary_entities
 
+        models = ContentType.objects.get_for_models(Show, Fact, Review, Article, PersonFact)
+
         page = self.request.GET.get('page', 1)
-        page_obj = Paginator(self.object.namedentityoccurrence_set.all(), 50).page(page)
+
+        with_shows_query1 = self.object.namedentityoccurrence_set.filter(
+            content_type=models[Show]).prefetch_related('content_object__poster_set')
+        with_shows_query2 = self.object.namedentityoccurrence_set.filter(
+            content_type__in=[models[Fact], models[Review]]).prefetch_related(
+            'content_object__show__poster_set')
+        with_articles_query = self.object.namedentityoccurrence_set.filter(
+            content_type=models[Article]).prefetch_related('content_object__articleimage_set')
+        with_persons_query = self.object.namedentityoccurrence_set.filter(
+            content_type=models[PersonFact]).prefetch_related('content_object__person__personimage_set')
+
+        combined = list(filter(None, chain(*zip_longest(with_shows_query1, with_shows_query2, with_articles_query, with_persons_query))))
+
+        page_obj = Paginator(combined, 50).page(page)
         context['page_obj'] = page_obj
 
         shows = {}
         articles = {}
         persons = {}
 
-        page_occurrences = NamedEntityOccurrence.objects.filter(id__in=page_obj.object_list).prefetch_related('content_object')
-
-        for occurrence in page_occurrences:
-            if occurrence.content_type == ContentType.objects.get_for_model(Fact):
+        for occurrence in page_obj.object_list:
+            if occurrence.content_type == models[Fact]:
                 self.append_occurrence(shows, occurrence.content_object.show, occurrence.content_object.string, occurrence)
-            elif occurrence.content_type == ContentType.objects.get_for_model(Review):
+            elif occurrence.content_type == models[Review]:
                 self.append_occurrence(shows, occurrence.content_object.show, occurrence.content_object.description, occurrence)
-            elif occurrence.content_type == ContentType.objects.get_for_model(Show):
+            elif occurrence.content_type == models[Show]:
                 self.append_occurrence(shows, occurrence.content_object, occurrence.content_object.description, occurrence)
-            elif occurrence.content_type == ContentType.objects.get_for_model(Article):
+            elif occurrence.content_type == models[Article]:
                 self.append_occurrence(articles, occurrence.content_object, occurrence.content_object.content, occurrence)
-            elif occurrence.content_type == ContentType.objects.get_for_model(PersonFact):
+            elif occurrence.content_type == models[PersonFact]:
                 self.append_occurrence(persons, occurrence.content_object.person, occurrence.content_object.string, occurrence)
 
-        context['items'] = filter(lambda x: x is not None, chain(*zip_longest(shows.values(), articles.values(), persons.values())))
+        context['items'] = filter(None, chain(*zip_longest(shows.values(), articles.values(), persons.values())))
 
         return context

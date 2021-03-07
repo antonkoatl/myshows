@@ -29,8 +29,8 @@ class NamedEntityView(generic.DetailView):
             i -= 1
         window_right = window_right[:-(occurrence.position_end + right_width - i) or None]
 
-        occurrence.window_left = re.sub(r'\[\/?(Kinopoisk|Myshows)]', '', window_left)
-        occurrence.window_right = re.sub(r'\[\/?(Kinopoisk|Myshows)]', '', window_right)
+        occurrence.window_left = re.sub(r'\[\/?(Kinopoisk|Myshows)]|<iframe', '', window_left)
+        occurrence.window_right = re.sub(r'\[\/?(Kinopoisk|Myshows)]|<iframe', '', window_right)
         occurrence.window_text = text[occurrence.position_start:occurrence.position_end]
 
         if item.id not in data:

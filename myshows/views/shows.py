@@ -135,4 +135,4 @@ class ShowListView(generic.ListView):
         for person in self.request.GET.getlist('person'):
             shows = shows.filter(personrole__person=person)
 
-        return shows
+        return shows.distinct()

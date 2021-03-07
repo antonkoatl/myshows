@@ -5,6 +5,7 @@ from django.db.models import FloatField, Func, F, Avg, Count, ExpressionWrapper
 from django.db.models.functions import Cast
 
 from myshows.models import Show, Article, Fact, Review, PersonFact, Episode
+from myshows.utils.myshows_api import parse_news
 from myshows.utils.named_entities import parse_html_text
 from mysite.celery import app
 
@@ -91,7 +92,14 @@ def update_cached_variables():
     cache.set('top_episodes', list(top_episodes.values_list('id', flat=True)), None)
 
 
+@app.task
+def parse_news_from_myshows():
+    """Task to parse news from myshows"""
+    parse_news()
+
+
 @app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     """Function to setup periodic tasks"""
     sender.add_periodic_task(3600, update_cached_variables.s(), name='update every hour')
+    sender.add_periodic_task(8 * 60 * 60, parse_news_from_myshows.s(), name='parse news from myshows')

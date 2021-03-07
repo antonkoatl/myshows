@@ -1,4 +1,22 @@
 <form id="searchForm" action="{% url 'all' %}" method="get">
+    {% for person in persons %}
+        <div class="clearfix border rounded p-2 m-2">
+            <div class="float-md-start mb-3 me-3">
+                <div style="width: 12rem; height: 18rem;">
+                    <a href="{% url 'person_detail' person.id %}">
+                        <img src="{{ person.get_poster }}" alt="..." style="max-width: 12rem; max-height: 18rem; margin-left: auto;margin-right: auto;display: block;">
+                    </a>
+                </div>
+                <div class="p-2 text-center" style="max-width: 12rem;">
+                    <span class="fw-bold">{{ person.get_name }}</span>
+                </div>
+                <input id="form-input-person-{{ person.id }}" name="person" type="hidden" value="{{ person.id }}">
+            </div>
+            <div class="col">
+                <button class="btn btn-secondary" onclick="document.getElementById('form-input-person-{{ person.id }}').remove(); this.form.submit()">X</button>
+            </div>
+        </div>
+    {% endfor %}
     <div class="accordion" id="accordionExample">
         <div class="accordion-item">
             <h2 class="accordion-header" id="heading1">

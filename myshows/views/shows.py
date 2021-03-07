@@ -6,7 +6,7 @@ from django.db.models import Count, Prefetch, Avg
 from django.urls import reverse
 from django.views import generic
 
-from myshows.models import Show, Poster, PersonRole, NamedEntityOccurrence, Genre, Tag, Country, Episode
+from myshows.models import Show, Poster, PersonRole, NamedEntityOccurrence, Genre, Tag, Country, Episode, Person
 from myshows.utils.utils import sample_facts
 
 
@@ -102,6 +102,9 @@ class ShowListView(generic.ListView):
         for item in context['types']:
             item['type_label'] = Show.ShowTypes(item['type']).label
 
+        if 'person' in self.request.GET:
+            context['persons'] = Person.objects.filter(id__in=self.request.GET.getlist('person'))
+
         context['request'] = self.request
         return context
 
@@ -128,5 +131,8 @@ class ShowListView(generic.ListView):
 
         if 'type' in self.request.GET:
             shows = shows.filter(type__in=self.request.GET.getlist('type'))
+
+        for person in self.request.GET.getlist('person'):
+            shows = shows.filter(personrole__person=person)
 
         return shows

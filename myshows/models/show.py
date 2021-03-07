@@ -14,6 +14,8 @@ from myshows.models.person import PersonRole
 
 
 class Show(models.Model):
+    class Meta:
+        ordering = ['-myshows_watching']
 
     class BroadcastStatus(models.TextChoices):
         UNKNOWN = "UKN", _("Неизвестно")

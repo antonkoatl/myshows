@@ -101,9 +101,10 @@ def get_new_question(mode='shows'):
         myshows_desc = re.search(r'\[Myshows](.+)\[\/Myshows]', description_marked, re.DOTALL)
         kinopoisk_desc = re.search(r'\[Kinopoisk](.+)\[\/Kinopoisk]', description_marked, re.DOTALL)
         if kinopoisk_desc:
-            description = '<p>' + myshows_desc.group(1) + '</p>'
-        elif myshows_desc:
             description = '<p>' + kinopoisk_desc.group(1) + '</p>'
+        elif myshows_desc:
+            description = '<p>' + myshows_desc.group(1) + '</p>'
+
 
         question['question_text'] = description
         question['text_variants'] = variants
